@@ -123,7 +123,7 @@
       searchAuthor() {
         if(this.authorName) {
           this.displayAuthor = false;
-          const path = `${this.api_url}/get-docs-by-author`;
+          const path = `${this.test_url}/get-docs-by-author`;
           var data = {};
           data['author_name'] = this.authorName;
           this.loading = true;
@@ -151,10 +151,10 @@
         }
       },
       getPublicationsForAuthor(authorName) {
-        const path = `${this.api_url}/get-publications-for-author?author_name=` + authorName;
+        const path = `${this.test_url}/get-publications-for-author`;
         var data = {};
         data['authorName'] = authorName;
-        axios.get(path, {headers: {  'Access-Control-Allow-Origin': '*',  'Access-Control-Allow-Headers': 'Content-Type', 'Access-Control-Max-Age' : '600'}}).then((response) => {
+        axios.post(path, data).then((response) => {
           if(typeof response.data.error === 'undefined') {
             this.authorPublications = response.data.publications;
             this.publicationsSpinner = false;
