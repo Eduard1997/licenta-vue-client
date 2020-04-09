@@ -1,7 +1,7 @@
 module.exports = {
   // options...
   devServer: {
-    proxy: 'http://client.eba-vt8prefm.us-east-2.elasticbeanstalk.com/',
-    /*disableHostCheck: true,*/
+    disableHostCheck: true,
+    proxy: 'http://licenta.eba-ivwtjfbm.us-east-2.elasticbeanstalk.com',
   },
 };
