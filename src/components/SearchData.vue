@@ -123,7 +123,7 @@
       searchAuthor() {
         if(this.authorName) {
           this.displayAuthor = false;
-          const path = `${this.test_url}/get-docs-by-author`;
+          const path = `${this.api_url}/get-docs-by-author`;
           var data = {};
           data['author_name'] = this.authorName;
           this.loading = true;
@@ -151,7 +151,7 @@
         }
       },
       getPublicationsForAuthor(authorName) {
-        const path = `${this.test_url}/get-publications-for-author?author_name=` + authorName;
+        const path = `${this.api_url}/get-publications-for-author?author_name=` + authorName;
         var data = {};
         data['authorName'] = authorName;
         axios.get(path).then((response) => {
