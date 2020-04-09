@@ -154,7 +154,7 @@
         const path = `${this.api_url}/get-publications-for-author?author_name=` + authorName;
         var data = {};
         data['authorName'] = authorName;
-        axios.get(path, {headers: {  'Access-Control-Allow-Origin': 'http://licenta.eba-ivwtjfbm.us-east-2.elasticbeanstalk.com' }}).then((response) => {
+        axios.get(path).then((response) => {
           if(typeof response.data.error === 'undefined') {
             this.authorPublications = response.data.publications;
             this.publicationsSpinner = false;
