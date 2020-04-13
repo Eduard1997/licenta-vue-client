@@ -151,7 +151,7 @@
         }
       },
       getPublicationsForAuthor(authorName) {
-        const path = `${this.api_url}/get-publications-for-author`;
+        const path = `${this.api_url}/get-publications-for-author2`;
         var data = {};
         data['authorName'] = authorName;
         axios.post(path, data).then((response) => {
