@@ -161,6 +161,12 @@
           }
         });
       },
+      getTest() {
+        const path = `${this.api_url}/get-test`;
+        axios.get(path).then((response) => {
+          console.log(response);
+        });
+      },
       viewSource(url) {
         window.open(url)
       },
@@ -177,6 +183,9 @@
         this.publicationsSpinner = !this.publicationsSpinner;
       }
     },
+    created() {
+      this.getTest();
+    }
   };
 </script>
 
