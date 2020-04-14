@@ -9,6 +9,7 @@ Vue.use(BootstrapVue);
 
 Vue.config.productionTip = false;
 axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+axios.defaults.headers.common['Access-Control-Max-Age'] = '1800';
 
 new Vue({
   router,
