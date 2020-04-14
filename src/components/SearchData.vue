@@ -163,7 +163,7 @@
       },
       getTest() {
         const path = `${this.api_url}/get-test`;
-        axios.get(path).then((response) => {
+        axios.get(path, {data: null}).then((response) => {
           console.log(response);
         });
       },
