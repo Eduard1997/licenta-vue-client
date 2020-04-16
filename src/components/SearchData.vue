@@ -39,9 +39,12 @@
           </div>
         </div>
       </div>
-      <div class="col-md-6">
-        <div class="card" style="width: 18rem;" v-if="displayAuthor">
-          <img :src="responseSearchAuthor.url_picture" class="card-img-top" alt="Avatar" height="200">
+    </div>
+
+    <div class="row mt-2">
+      <div class="col">
+        <div class="card" style="width: 100%;" v-if="displayAuthor">
+          <img :src="responseSearchAuthor.url_picture" class="card-img-top " alt="Avatar" height="200">
           <div class="card-body">
             <h5 class="card-title">{{responseSearchAuthor.author_name}}</h5>
             <p class="card-text">{{responseSearchAuthor.affiliation}}</p>
@@ -92,6 +95,7 @@
         </div>
       </div>
     </div>
+
   </div>
 </template>
 
@@ -123,7 +127,7 @@
       searchAuthor() {
         if(this.authorName) {
           this.displayAuthor = false;
-          const path = `${this.api_url}/get-docs-by-author`;
+          const path = `${this.test_url}/get-docs-by-author`;
           var data = {};
           data['author_name'] = this.authorName;
           this.loading = true;
@@ -137,11 +141,11 @@
                   this.showAlert = false;
                 },2000);
               } else {
+                this.getPublicationsForAuthor(this.authorName);
                 this.displayAuthor = true;
                 this.responseSearchAuthor = response.data;
               }
             });
-          this.getPublicationsForAuthor(this.authorName)
         } else {
           this.alertText = 'Please type an author name';
           this.showAlert = true;
@@ -151,7 +155,7 @@
         }
       },
       getPublicationsForAuthor(authorName) {
-        const path = `${this.api_url}/get-publications-for-author2`;
+        const path = `${this.test_url}/get-publications-for-author`;
         var data = {};
         data['authorName'] = authorName;
         axios.post(path, data).then((response) => {
@@ -162,7 +166,7 @@
         });
       },
       getTest() {
-        const path = `${this.api_url}/get-test`;
+        const path = `${this.test_url}/get-test`;
         axios.get(path, {data: null}).then((response) => {
           console.log(response);
         });
@@ -190,12 +194,14 @@
 </script>
 
 <style>
-
   .centered {
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     z-index: 999;
+  }
+  .card-img-top {
+    width: 225px !important;
   }
 </style>

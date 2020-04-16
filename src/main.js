@@ -8,8 +8,9 @@ import axios from 'axios';
 Vue.use(BootstrapVue);
 
 Vue.config.productionTip = false;
-axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
-axios.defaults.headers.common['Access-Control-Max-Age'] = '5000';
+// axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+// axios.defaults.headers.common['Access-Control-Allow-Origin'] = 'http://localhost:8080';
+// axios.defaults.headers.common['Access-Control-Max-Age'] = '5000';
 
 new Vue({
   router,
