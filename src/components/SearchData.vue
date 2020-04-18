@@ -80,7 +80,7 @@
               </span>
               <b-collapse id="collapse-4" v-model="publicationsVisible" class="mt-2">
                 <div style="text-align: center">
-                  <b-spinner label="Spinning" v-if="publicationsSpinner"></b-spinner>
+                  <b-spinner label="Spinning" v-if="publicationsSpinner && authorPublications.length > 0"></b-spinner>
                 </div>
                 <div>
                   <template v-for="(publication, key) in authorPublications">
@@ -127,6 +127,8 @@
       searchAuthor() {
         if(this.authorName) {
           this.displayAuthor = false;
+          this.authorPublications = '';
+          this.responseSearchAuthor = '';
           const path = `${this.test_url}/get-docs-by-author`;
           var data = {};
           data['author_name'] = this.authorName;
@@ -165,12 +167,6 @@
           }
         });
       },
-      getTest() {
-        const path = `${this.test_url}/get-test`;
-        axios.get(path, {data: null}).then((response) => {
-          console.log(response);
-        });
-      },
       viewSource(url) {
         window.open(url)
       },
@@ -187,9 +183,6 @@
         this.publicationsSpinner = !this.publicationsSpinner;
       }
     },
-    created() {
-      this.getTest();
-    }
   };
 </script>
 
