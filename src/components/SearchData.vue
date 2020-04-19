@@ -36,13 +36,11 @@
                 </span>
               </li>
             </ul>
+            <button type="button" class="btn btn-primary btn-sm mt-2" @click="viewPublications()" v-if="responseSearchAuthor">View publications</button>
           </div>
         </div>
       </div>
-    </div>
-
-    <div class="row mt-2">
-      <div class="col">
+      <div class="col-sm-6">
         <div class="card" style="width: 100%;" v-if="displayAuthor">
           <img :src="responseSearchAuthor.url_picture" class="card-img-top " alt="Avatar" height="200">
           <div class="card-body">
@@ -52,6 +50,12 @@
           <ul class="list-group list-group-flush">
             <li class="list-group-item">
               <b>Interests:</b> <span v-for="(interests, key) in responseSearchAuthor.interests">{{interests}}<span v-if="key !== responseSearchAuthor.interests.length -1">,</span>  </span>
+            </li>
+            <li class="list-group-item" style="height: 86px; overflow-y: auto;">
+              <b>Coauthors:</b> <br/>
+              <template v-for="(coauthors,key) in responseSearchAuthor.coauthors">
+                <span> <b>{{key}}</b>: {{coauthors}} </span> <br/>
+              </template>
             </li>
             <li class="list-group-item" style="height: 86px; overflow-y: auto;">
               <b>Cites per year:</b> <br/>
@@ -74,7 +78,7 @@
             <li class="list-group-item">
               <b>I10 5 Years Index:</b> <span>{{responseSearchAuthor.i10_index5y}}</span>
             </li>
-            <li class="list-group-item publications-list" style="overflow-y: auto; ">
+            <!--<li class="list-group-item publications-list" style="overflow-y: auto; ">
               <span @click="showPublications()" style="cursor: pointer">
                 <b>View publications:</b>
               </span>
@@ -90,7 +94,7 @@
                   </template>
                 </div>
               </b-collapse>
-            </li>
+            </li>-->
           </ul>
         </div>
       </div>
@@ -112,9 +116,7 @@
         loading: false,
         color: 'green',
         size: '20px',
-        responseSearchAuthor: {
-          url_picture: ''
-        },
+        responseSearchAuthor: '',
         authorPublications: '',
         alertText: '',
         publicationsVisible: false,
@@ -143,7 +145,7 @@
                   this.showAlert = false;
                 },2000);
               } else {
-                this.getPublicationsForAuthor(this.authorName);
+                /*this.getPublicationsForAuthor(this.authorName);*/
                 this.displayAuthor = true;
                 this.responseSearchAuthor = response.data;
               }
@@ -181,6 +183,9 @@
 
         this.publicationsVisible = !this.publicationsVisible;
         this.publicationsSpinner = !this.publicationsSpinner;
+      },
+      viewPublications() {
+        this.$router.push({name: 'AuthorPublications', query: {author_name: this.authorName} })
       }
     },
   };
