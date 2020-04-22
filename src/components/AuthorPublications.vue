@@ -25,6 +25,9 @@
               <th class="text-center">Aggregation Type</th>
               <th class="text-center">Publication Name</th>
               <th class="text-center">Subtype Description</th>
+              <th class="text-center">DBLP Link</th>
+              <th class="text-center">DBLP Type</th>
+              <th class="text-center">DBLP Venue</th>
             </tr>
           </thead>
           <tbody>
@@ -40,6 +43,9 @@
                 <td class="text-center"> <span v-if="typeof(publication.aggregation_type !== 'undefined') && publication.aggregation_type">{{publication.aggregation_type}}</span> <span v-else>-</span> </td>
                 <td class="text-center"> <span v-if="typeof(publication.publication_name !== 'undefined') && publication.publication_name">{{publication.publication_name}}</span> <span v-else>-</span> </td>
                 <td class="text-center"> <span v-if="typeof(publication.subtype_description !== 'undefined') && publication.subtype_description">{{publication.subtype_description}}</span> <span v-else>-</span> </td>
+                <td class="text-center"> <span v-if="typeof(publication.dblp_link !== 'undefined') && publication.dblp_link" class="badge badge-pill badge-primary" style="cursor: pointer" @click="openUrl(publication.dblp_link)">View DBLP Link</span> <span v-else>-</span> </td>
+                <td class="text-center"> <span v-if="typeof(publication.dblp_type !== 'undefined') && publication.dblp_type">{{publication.dblp_type}}</span> <span v-else>-</span> </td>
+                <td class="text-center"> <span v-if="typeof(publication.dblp_venue !== 'undefined') && publication.dblp_venue">{{publication.dblp_venue}}</span> <span v-else>-</span> </td>
               </tr>
             </template>
           </tbody>
