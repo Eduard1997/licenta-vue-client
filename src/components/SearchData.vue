@@ -11,7 +11,10 @@
           <button type="button" class="btn btn-primary btn-sm ml-2 search-author-btn"
                   v-on:click="searchAuthor()">Search author
           </button>
+          <b-button v-b-toggle.metrics-collapse variant="primary" class="btn-sm ml-2">Metrics explanation</b-button>
         </div>
+
+        <b-collapse id="metrics-collapse" class="mt-2">
         <div class="row">
           <div class="col mt-2">
             <span>Metrics explanations:</span>
@@ -39,8 +42,10 @@
             <button type="button" class="btn btn-primary btn-sm mt-2" @click="viewPublications()" v-if="responseSearchAuthor">View publications</button>
           </div>
         </div>
+        </b-collapse>
       </div>
-      <div class="col-sm-6">
+
+      <div class="col-md-6">
         <div class="card" style="width: 100%;" v-if="displayAuthor">
           <img :src="responseSearchAuthor.url_picture" class="card-img-top " alt="Avatar" height="200">
           <div class="card-body">
@@ -54,17 +59,14 @@
             <li class="list-group-item" style="height: 86px; overflow-y: auto;">
               <b>Coauthors:</b> <br/>
               <template v-for="(coauthors,key) in responseSearchAuthor.coauthors">
-                <span> <b>{{key}}</b>: {{coauthors}} </span> <br/>
+                <span> <b>{{Object.keys(coauthors)[0]}}</b>: {{coauthors[Object.keys(coauthors)[0]]}} </span> <br/>
               </template>
             </li>
             <li class="list-group-item" style="height: 86px; overflow-y: auto;">
               <b>Cites per year:</b> <br/>
               <template v-for="(cites,key) in responseSearchAuthor.cites_per_year">
-                <span>{{key}}: {{cites}}, </span>
+                <span>{{Object.keys(cites)[0]}}: {{cites[Object.keys(cites)[0]]}}, </span>
               </template>
-            </li>
-            <li class="list-group-item">
-              <b>Email: </b> <span>{{responseSearchAuthor.email}}</span>
             </li>
             <li class="list-group-item">
               <b>H Index:</b> <span>{{responseSearchAuthor.h_index}}</span>
