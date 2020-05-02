@@ -39,7 +39,6 @@
                 </span>
               </li>
             </ul>
-            <button type="button" class="btn btn-primary btn-sm mt-2" @click="viewPublications()" v-if="responseSearchAuthor">View publications</button>
           </div>
         </div>
         </b-collapse>
@@ -186,9 +185,6 @@
         this.publicationsVisible = !this.publicationsVisible;
         this.publicationsSpinner = !this.publicationsSpinner;
       },
-      viewPublications() {
-        this.$router.push({name: 'AuthorPublications', query: {author_name: this.authorName} })
-      }
     },
   };
 </script>
