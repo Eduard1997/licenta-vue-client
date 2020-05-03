@@ -22,10 +22,5 @@ export default new Router({
       name: 'SearchData',
       component: SearchData,
     },
-    {
-      path: '/author-publications',
-      name: 'AuthorPublications',
-      component: AuthorPublications,
-    },
   ],
 });

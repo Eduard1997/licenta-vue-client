@@ -4,14 +4,6 @@
     <div class="alert alert-danger" v-if="showAlert">{{alertText}}</div>
     <div class="row">
       <div class="col">
-        <h3>View publications for: {{authorName}}</h3>
-      </div>
-      <div class="col text-right">
-        <button type="button" class="btn btn-sm btn-primary" @click="backToSearch()">Back to search</button>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col">
         <table class="table table-bordered table-responsive-xl" v-if="authorPublications">
           <thead class="thead-light">
             <tr>
@@ -23,7 +15,6 @@
               <th class="text-center">Eprint</th>
               <th class="text-center">Scopus Link</th>
               <th class="text-center">Aggregation Type</th>
-              <th class="text-center">Publication Name</th>
               <th class="text-center">Subtype Description</th>
               <th class="text-center">DBLP Link</th>
               <th class="text-center">DBLP Type</th>
@@ -41,7 +32,6 @@
                 <td class="text-center"> <span v-if="publication.eprint" class="badge badge-pill badge-success" style="cursor: pointer" @click="openUrl(publication.eprint)">View eprint</span> <span v-else>-</span> </td>
                 <td class="text-center"> <span v-if="typeof(publication.scopus_link) !== 'undefined'" class="badge badge-pill badge-info" style="cursor: pointer" @click="openUrl(publication.scopus_link)">View scopus url</span> <span v-else>-</span> </td>
                 <td class="text-center"> <span v-if="typeof(publication.aggregation_type !== 'undefined') && publication.aggregation_type">{{publication.aggregation_type}}</span> <span v-else>-</span> </td>
-                <td class="text-center"> <span v-if="typeof(publication.publication_name !== 'undefined') && publication.publication_name">{{publication.publication_name}}</span> <span v-else>-</span> </td>
                 <td class="text-center"> <span v-if="typeof(publication.subtype_description !== 'undefined') && publication.subtype_description">{{publication.subtype_description}}</span> <span v-else>-</span> </td>
                 <td class="text-center"> <span v-if="typeof(publication.dblp_link !== 'undefined') && publication.dblp_link" class="badge badge-pill badge-primary" style="cursor: pointer" @click="openUrl(publication.dblp_link)">View DBLP Link</span> <span v-else>-</span> </td>
                 <td class="text-center"> <span v-if="typeof(publication.dblp_type !== 'undefined') && publication.dblp_type">{{publication.dblp_type}}</span> <span v-else>-</span> </td>
@@ -74,10 +64,9 @@
     },
     methods: {
       getAuthorPublications() {
-        var authorName = this.$route.query.author_name;
         const path = `${this.test_url}/get-publications-for-author`;
         var data = {};
-        data['authorName'] = authorName;
+        data['authorName'] = 'Stefan Ciobaca';
         axios.post(path, data).then((response) => {
           if(typeof response.data.error === 'undefined') {
             this.authorPublications = response.data.publications;

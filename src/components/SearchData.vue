@@ -12,6 +12,9 @@
                   v-on:click="searchAuthor()">Search author
           </button>
           <b-button v-b-toggle.metrics-collapse variant="primary" class="btn-sm ml-2">Metrics explanation</b-button>
+          <div class="text-right w-100" v-if="responseSearchAuthor">
+            <b-button v-b-toggle.author-details-collapse variant="primary" size="sm" class="mt-2">Show/Hide Author Details</b-button>
+          </div>
         </div>
 
         <b-collapse id="metrics-collapse" class="mt-2">
@@ -45,6 +48,7 @@
       </div>
 
       <div class="col-md-6">
+        <b-collapse id="author-details-collapse" visible>
         <div class="card" style="width: 100%;" v-if="displayAuthor">
           <img :src="responseSearchAuthor.url_picture" class="card-img-top " alt="Avatar" height="200">
           <div class="card-body">
@@ -98,7 +102,13 @@
             </li>-->
           </ul>
         </div>
+        </b-collapse>
       </div>
+
+    </div>
+
+    <div class="row">
+      <author-publications></author-publications>
     </div>
 
   </div>
@@ -107,9 +117,10 @@
 <script>
   import axios from 'axios';
   import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
+  import AuthorPublications from './AuthorPublications';
 
   export default {
-    components: { PulseLoader },
+    components: { PulseLoader, AuthorPublications },
     name: 'SearchData',
     data() {
       return {
