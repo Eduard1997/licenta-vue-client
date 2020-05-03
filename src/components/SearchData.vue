@@ -1,4 +1,5 @@
 <template>
+  <div>
   <div class="container">
     <pulse-loader class="centered" :loading="loading" :color="color" :size="size"></pulse-loader>
     <div class="alert alert-danger" v-if="showAlert">{{alertText}}</div>
@@ -12,12 +13,12 @@
                   v-on:click="searchAuthor()">Search author
           </button>
           <b-button v-b-toggle.metrics-collapse variant="primary" class="btn-sm ml-2">Metrics explanation</b-button>
-          <div class="text-right w-100" v-if="responseSearchAuthor">
-            <b-button v-b-toggle.author-details-collapse variant="primary" size="sm" class="mt-2">Show/Hide Author Details</b-button>
+          <div class="text-right w-100 mr-4" v-if="responseSearchAuthor">
+            <b-button v-b-toggle.author-details-collapse variant="primary" size="sm" class="mt-2">Author Details</b-button>
           </div>
         </div>
 
-        <b-collapse id="metrics-collapse" class="mt-2">
+        <b-collapse id="metrics-collapse" visible class="mt-2">
         <div class="row">
           <div class="col mt-2">
             <span>Metrics explanations:</span>
@@ -106,10 +107,11 @@
       </div>
 
     </div>
-
-    <div class="row">
-      <author-publications></author-publications>
+  </div>
+    <div class="container-fluid mt-2">
+        <author-publications v-if="showPublications" :authorName="authorName"></author-publications>
     </div>
+
 
   </div>
 </template>
@@ -134,11 +136,13 @@
         publicationsVisible: false,
         publicationsSpinner: false,
         displayAuthor: false,
-        showAlert: false
+        showAlert: false,
+        showPublications: false
       };
     },
     methods: {
       searchAuthor() {
+        this.showPublications = false;
         if(this.authorName) {
           this.displayAuthor = false;
           this.authorPublications = '';
@@ -150,6 +154,7 @@
           axios.post(path, data)
             .then((response) => {
               this.loading = false;
+              this.showPublications = true;
               if(typeof response.data.error !== 'undefined') {
                 this.alertText = response.data.error;
                 this.showAlert = true;
@@ -157,7 +162,6 @@
                   this.showAlert = false;
                 },2000);
               } else {
-                /*this.getPublicationsForAuthor(this.authorName);*/
                 this.displayAuthor = true;
                 this.responseSearchAuthor = response.data;
               }
@@ -170,31 +174,8 @@
           },2000);
         }
       },
-      getPublicationsForAuthor(authorName) {
-        const path = `${this.test_url}/get-publications-for-author`;
-        var data = {};
-        data['authorName'] = authorName;
-        axios.post(path, data).then((response) => {
-          if(typeof response.data.error === 'undefined') {
-            this.authorPublications = response.data.publications;
-            this.publicationsSpinner = false;
-          }
-        });
-      },
       viewSource(url) {
         window.open(url)
-      },
-      showPublications() {
-        if(!document.getElementsByClassName('publications-list')[0].classList.contains('js-active')) {
-          document.getElementsByClassName('publications-list')[0].style.height="193px";
-          document.getElementsByClassName('publications-list')[0].classList.add('js-active');
-        } else {
-          document.getElementsByClassName('publications-list')[0].style.height="auto";
-          document.getElementsByClassName('publications-list')[0].classList.remove('js-active');
-        }
-
-        this.publicationsVisible = !this.publicationsVisible;
-        this.publicationsSpinner = !this.publicationsSpinner;
       },
     },
   };

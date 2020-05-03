@@ -1,5 +1,5 @@
 <template>
-  <div class="container-fluid">
+  <div>
     <pulse-loader class="centered" :loading="loading" :color="color" :size="size"></pulse-loader>
     <div class="alert alert-danger" v-if="showAlert">{{alertText}}</div>
     <div class="row">
@@ -8,10 +8,9 @@
           <thead class="thead-light">
             <tr>
               <th class="text-center">Name</th>
-              <th class="text-center">Scopus Cited No</th>
-              <th class="text-center">Scopus Cited By Link</th>
               <th class="text-center">Year</th>
-              <th class="text-center">URL</th>
+              <th class="text-center">Cited No</th>
+              <th class="text-center">Scopus Cited By Link</th>
               <th class="text-center">Eprint</th>
               <th class="text-center">Scopus Link</th>
               <th class="text-center">Aggregation Type</th>
@@ -25,10 +24,9 @@
             <template v-for="publication in authorPublications">
               <tr>
                 <td>{{publication.title}}</td>
+                <td class="text-center"> <span v-if="publication.year">{{publication.year}}</span> <span v-else>-</span> </td>
                 <td class="text-center"> <span v-if="typeof(publication.cited_by !== 'undefined') && publication.cited_by">{{publication.cited_by}}</span> <span v-else>-</span> </td>
                 <td class="text-center"> <span v-if="typeof(publication.cited_by_link) !== 'undefined'" class="badge badge-pill badge-primary" style="cursor: pointer" @click="openUrl(publication.cited_by_link)">Open citations</span> <span v-else>-</span> </td>
-                <td class="text-center"> <span v-if="publication.year">{{publication.year}}</span> <span v-else>-</span> </td>
-                <td class="text-center"> <span v-if="publication.url" class="badge badge-pill badge-warning" style="cursor: pointer" @click="openUrl(publication.url)">View publication</span> <span v-else>-</span> </td>
                 <td class="text-center"> <span v-if="publication.eprint" class="badge badge-pill badge-success" style="cursor: pointer" @click="openUrl(publication.eprint)">View eprint</span> <span v-else>-</span> </td>
                 <td class="text-center"> <span v-if="typeof(publication.scopus_link) !== 'undefined'" class="badge badge-pill badge-info" style="cursor: pointer" @click="openUrl(publication.scopus_link)">View scopus url</span> <span v-else>-</span> </td>
                 <td class="text-center"> <span v-if="typeof(publication.aggregation_type !== 'undefined') && publication.aggregation_type">{{publication.aggregation_type}}</span> <span v-else>-</span> </td>
@@ -51,6 +49,7 @@
 
   export default {
     components: { PulseLoader },
+    props: ['authorName'],
     name: 'AuthorPubications',
     data() {
       return {
@@ -66,7 +65,7 @@
       getAuthorPublications() {
         const path = `${this.test_url}/get-publications-for-author`;
         var data = {};
-        data['authorName'] = 'Stefan Ciobaca';
+        data['authorName'] = this.authorName;
         axios.post(path, data).then((response) => {
           if(typeof response.data.error === 'undefined') {
             this.authorPublications = response.data.publications;
@@ -82,7 +81,6 @@
       }
     },
     created() {
-      this.authorName = this.$route.query.author_name;
       this.getAuthorPublications();
     }
   };
