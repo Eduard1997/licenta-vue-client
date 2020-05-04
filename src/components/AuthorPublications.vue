@@ -7,17 +7,20 @@
         <table class="table table-bordered table-responsive-xl" v-if="authorPublications">
           <thead class="thead-light">
             <tr>
-              <th class="text-center">Name</th>
-              <th class="text-center">Year</th>
-              <th class="text-center">Cited No</th>
-              <th class="text-center">Scopus Cited By Link</th>
-              <th class="text-center">Eprint</th>
-              <th class="text-center">Scopus Link</th>
-              <th class="text-center">Aggregation Type</th>
-              <th class="text-center">Subtype Description</th>
-              <th class="text-center">DBLP Link</th>
-              <th class="text-center">DBLP Type</th>
-              <th class="text-center">DBLP Venue</th>
+              <th class="text-center" >Name</th>
+              <th class="text-center" >Year</th>
+              <th class="text-center" style="white-space: nowrap">Scholar <br> - Cited By - </th>
+              <th class="text-center" style="white-space: nowrap">Scholar <br> - Citations - </th>
+              <th class="text-center" >Publication Name</th>
+              <th class="text-center" >URL</th>
+              <th class="text-center" style="white-space: nowrap">Scopus <br> - Cited By -</th>
+              <th class="text-center" style="white-space: nowrap">Scopus <br> - Citations - </th>
+              <th class="text-center" style="white-space: nowrap">Scopus <br> - URL - </th>
+              <th class="text-center" style="white-space: nowrap">Scopus <br> - Aggregation Type - </th>
+              <th class="text-center" style="white-space: nowrap">Scopus <br> - Subtype Description -</th>
+              <th class="text-center" style="white-space: nowrap">DBLP <br> - Type -</th>
+              <th class="text-center" style="white-space: nowrap">DBLP <br> - Venue -</th>
+              <th class="text-center" style="white-space: nowrap">DBLP <br> - Link -</th>
             </tr>
           </thead>
           <tbody>
@@ -25,15 +28,22 @@
               <tr>
                 <td>{{publication.title}}</td>
                 <td class="text-center"> <span v-if="publication.year">{{publication.year}}</span> <span v-else>-</span> </td>
-                <td class="text-center"> <span v-if="typeof(publication.cited_by !== 'undefined') && publication.cited_by">{{publication.cited_by}}</span> <span v-else>-</span> </td>
-                <td class="text-center"> <span v-if="typeof(publication.cited_by_link) !== 'undefined'" class="badge badge-pill badge-primary" style="cursor: pointer" @click="openUrl(publication.cited_by_link)">Open citations</span> <span v-else>-</span> </td>
-                <td class="text-center"> <span v-if="publication.eprint" class="badge badge-pill badge-success" style="cursor: pointer" @click="openUrl(publication.eprint)">View eprint</span> <span v-else>-</span> </td>
-                <td class="text-center"> <span v-if="typeof(publication.scopus_link) !== 'undefined'" class="badge badge-pill badge-info" style="cursor: pointer" @click="openUrl(publication.scopus_link)">View scopus url</span> <span v-else>-</span> </td>
-                <td class="text-center"> <span v-if="typeof(publication.aggregation_type !== 'undefined') && publication.aggregation_type">{{publication.aggregation_type}}</span> <span v-else>-</span> </td>
-                <td class="text-center"> <span v-if="typeof(publication.subtype_description !== 'undefined') && publication.subtype_description">{{publication.subtype_description}}</span> <span v-else>-</span> </td>
-                <td class="text-center"> <span v-if="typeof(publication.dblp_link !== 'undefined') && publication.dblp_link" class="badge badge-pill badge-primary" style="cursor: pointer" @click="openUrl(publication.dblp_link)">View DBLP Link</span> <span v-else>-</span> </td>
-                <td class="text-center"> <span v-if="typeof(publication.dblp_type !== 'undefined') && publication.dblp_type">{{publication.dblp_type}}</span> <span v-else>-</span> </td>
-                <td class="text-center"> <span v-if="typeof(publication.dblp_venue !== 'undefined') && publication.dblp_venue">{{publication.dblp_venue}}</span> <span v-else>-</span> </td>
+                <td class="text-center"> <span v-if="typeof(publication.cited_by_scholar) !== 'undefined' && publication.cited_by_scholar">{{publication.cited_by_scholar}}</span> <span v-else>-</span> </td>
+                <td class="text-center"> <span class="badge badge-warning" v-if="typeof(publication.cited_by_link_scholar) !== 'undefined' && publication.cited_by_link_scholar" @click="openUrl(publication.cited_by_link_scholar)" style="cursor: pointer">View citations</span> <span v-else>-</span> </td>
+                <td class="text-center"> <span v-if="typeof(publication.publication_name) !== 'undefined' && publication.publication_name">{{publication.publication_name}}</span> <span v-else>-</span> </td>
+                <td class="text-center">
+                  <span class="badge badge-success" v-if="typeof(publication.eprint) !== 'undefined' && publication.eprint" @click="openUrl(publication.eprint)" style="cursor: pointer">View document</span>
+                  <span class="badge badge-success" v-else-if="typeof(publication.url) !== 'undefined' && publication.url" @click="openUrl(publication.url)" style="cursor: pointer">View document</span>
+                  <span v-else> - </span>
+                </td>
+                <td class="text-center"> <span v-if="typeof(publication.cited_by_scopus) !== 'undefined' && publication.cited_by_scopus">{{publication.cited_by_scopus}}</span> <span v-else>-</span> </td>
+                <td class="text-center"> <span class="badge badge-secondary" v-if="typeof(publication.cited_by_link_scopus) !== 'undefined' && publication.cited_by_link_scopus" @click="openUrl(publication.cited_by_link_scopus)" style="cursor: pointer">View citations</span> <span v-else>-</span> </td>
+                <td class="text-center"> <span class="badge badge-info" v-if="typeof(publication.scopus_link) !== 'undefined' && publication.scopus_link" @click="openUrl(publication.scopus_link)" style="cursor: pointer">View document</span> <span v-else>-</span> </td>
+                <td class="text-center"> <span v-if="typeof(publication.scopus_aggregation_type) !== 'undefined' && publication.scopus_aggregation_type">{{publication.scopus_aggregation_type}}</span> <span v-else>-</span> </td>
+                <td class="text-center"> <span v-if="typeof(publication.scopus_subtype_description) !== 'undefined' && publication.scopus_subtype_description">{{publication.scopus_subtype_description}}</span> <span v-else>-</span> </td>
+                <td class="text-center"> <span v-if="typeof(publication.dblp_type) !== 'undefined' && publication.dblp_type">{{publication.dblp_type}}</span> <span v-else>-</span> </td>
+                <td class="text-center"> <span v-if="typeof(publication.dblp_venue) !== 'undefined' && publication.dblp_venue">{{publication.dblp_venue}}</span> <span v-else>-</span> </td>
+                <td class="text-center"> <span class="badge badge-info" v-if="typeof(publication.dblp_link) !== 'undefined' && publication.dblp_link" @click="openUrl(publication.dblp_link)" style="cursor: pointer">View document</span> <span v-else>-</span> </td>
               </tr>
             </template>
           </tbody>
@@ -96,6 +106,9 @@
   }
   th,td {
     vertical-align: middle !important;
+  }
+  table {
+    font-size: 13px;
   }
 </style>
 
