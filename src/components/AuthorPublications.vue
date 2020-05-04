@@ -42,7 +42,12 @@
                 <td class="text-center"> <span v-if="typeof(publication.scopus_aggregation_type) !== 'undefined' && publication.scopus_aggregation_type">{{publication.scopus_aggregation_type}}</span> <span v-else>-</span> </td>
                 <td class="text-center"> <span v-if="typeof(publication.scopus_subtype_description) !== 'undefined' && publication.scopus_subtype_description">{{publication.scopus_subtype_description}}</span> <span v-else>-</span> </td>
                 <td class="text-center"> <span v-if="typeof(publication.dblp_type) !== 'undefined' && publication.dblp_type">{{publication.dblp_type}}</span> <span v-else>-</span> </td>
-                <td class="text-center"> <span v-if="typeof(publication.dblp_venue) !== 'undefined' && publication.dblp_venue">{{publication.dblp_venue}}</span> <span v-else>-</span> </td>
+                <td class="text-center"> <span v-if="typeof(publication.dblp_venue) !== 'undefined' && publication.dblp_venue && !Array.isArray(publication.dblp_venue)">{{publication.dblp_venue}}</span>
+                  <span v-else-if="typeof(publication.dblp_venue) !== 'undefined' && publication.dblp_venue && Array.isArray(publication.dblp_venue)">
+                    <template v-for="item in publication.dblp_venue">{{item}}, </template>
+                  </span>
+                  <span v-else>-</span>
+                </td>
                 <td class="text-center"> <span class="badge badge-info" v-if="typeof(publication.dblp_link) !== 'undefined' && publication.dblp_link" @click="openUrl(publication.dblp_link)" style="cursor: pointer">View document</span> <span v-else>-</span> </td>
               </tr>
             </template>

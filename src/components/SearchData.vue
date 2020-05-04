@@ -63,7 +63,7 @@
             <li class="list-group-item" style="height: 86px; overflow-y: auto;">
               <b>Coauthors:</b> <br/>
               <template v-for="(coauthors,key) in responseSearchAuthor.coauthors">
-                <span> <b>{{Object.keys(coauthors)[0]}}</b>: {{coauthors[Object.keys(coauthors)[0]]}} </span> <br/>
+                <span> <b><a href="javascript:;" v-on:click="searchCoauthor(Object.keys(coauthors)[0])">{{Object.keys(coauthors)[0]}}</a></b>: {{coauthors[Object.keys(coauthors)[0]]}} </span> <br/>
               </template>
             </li>
             <li class="list-group-item" style="height: 86px; overflow-y: auto;">
@@ -173,6 +173,11 @@
             this.showAlert = false;
           },2000);
         }
+      },
+      searchCoauthor(coauthorName) {
+        this.authorName = coauthorName;
+        this.searchAuthor();
+
       },
       viewSource(url) {
         window.open(url)
