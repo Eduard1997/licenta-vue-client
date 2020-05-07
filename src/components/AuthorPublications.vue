@@ -26,7 +26,9 @@
           <tbody>
             <template v-for="publication in authorPublications">
               <tr>
-                <td>{{publication.title}}</td>
+                <td>
+                  <a href="javascript:;" v-on:click="getCitations(publication.title)">{{publication.title}}</a>
+                </td>
                 <td class="text-center"> <span v-if="publication.year">{{publication.year}}</span> <span v-else>-</span> </td>
                 <td class="text-center"> <span v-if="typeof(publication.cited_by_scholar) !== 'undefined' && publication.cited_by_scholar">{{publication.cited_by_scholar}}</span> <span v-else>-</span> </td>
                 <td class="text-center"> <span class="badge badge-warning" v-if="typeof(publication.cited_by_link_scholar) !== 'undefined' && publication.cited_by_link_scholar" @click="openUrl(publication.cited_by_link_scholar)" style="cursor: pointer">View citations</span> <span v-else>-</span> </td>
@@ -55,16 +57,25 @@
         </table>
       </div>
     </div>
+      <b-modal id="citations-modal" size="xl" :title="modalTitle" :ok-only="true">
+        <div class="row text-center">
+          <b-spinner variant="success" class="modal-spinner" type="grow" style="margin: auto; display: none"></b-spinner>
+        </div>
+        <div class="modal-content-citations">
+
+        </div>
+      </b-modal>
   </div>
 </template>
 
 <script>
   import axios from 'axios';
   import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
+  import $ from 'jquery';
 
   export default {
     components: { PulseLoader },
-    props: ['authorName'],
+    props: {'authorName': String},
     name: 'AuthorPubications',
     data() {
       return {
@@ -73,7 +84,9 @@
         size: '20px',
         showAlert: false,
         authorPublications: '',
-        authorName: ''
+        authorName: '',
+        modalTitle: '',
+        citationsArray: {}
       };
     },
     methods: {
@@ -88,11 +101,50 @@
           }
         });
       },
-      backToSearch() {
-        this.$router.push({name: 'SearchData'})
-      },
       openUrl(url) {
         window.open(url)
+      },
+      getCitations(publicationName) {
+        this.$root.$emit("bv::show::modal", "citations-modal");
+        this.modalTitle = 'Citations for: ' + publicationName;
+        $('.modal-content-citations').empty();
+        $('.modal-spinner').show();
+
+        if(typeof this.citationsArray[publicationName] === 'undefined') {
+          const path = `${this.test_url}/get-citations-for-publication`;
+          var data = {};
+          data['publicationName'] = publicationName;
+          data['authorName'] = this.authorName;
+          axios.post(path, data).then((response) => {
+            $('.modal-spinner').hide();
+            if(typeof response.data.message !== 'undefined') {
+              var alertHtml = '<div class="alert alert-danger">' + response.data.message + '</div>';
+              $('.modal-content-citations').append(alertHtml);
+              this.citationsArray[publicationName] = response.data.message;
+            } else {
+              $.each(response.data, function(key, value) {
+                var title = value['title'];
+                var link = value['link'];
+                var HTML = '<div><a href="' + link + '">' + title + '</a></div>';
+                $('.modal-content-citations').append(HTML);
+              });
+              this.citationsArray[publicationName] = response.data;
+            }
+          });
+        } else {
+          $('.modal-spinner').hide();
+          if(typeof this.citationsArray[publicationName] === 'object') {
+            $.each(this.citationsArray[publicationName], function(key, value) {
+              var title = value['title'];
+              var link = value['link'];
+              var HTML = '<div><a href="' + link + '">' + title + '</a></div>';
+              $('.modal-content-citations').append(HTML);
+            });
+          } else {
+            var alertHtml = '<div class="alert alert-danger">' + this.citationsArray[publicationName] + '</div>';
+            $('.modal-content-citations').append(alertHtml);
+          }
+        }
       }
     },
     created() {
