@@ -51,8 +51,9 @@
             </div>
           </b-collapse>
           <b-form-file
-            class="mt-2"
+            class="mt-2 import-input"
             v-on:change="importData()"
+
             placeholder="Import data"
             drop-placeholder="Drop file here..."
             id="myFile"
@@ -137,6 +138,7 @@
   import axios from 'axios';
   import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
   import AuthorPublications from './AuthorPublications';
+  import $ from 'jquery';
 
   export default {
     components: {
@@ -223,6 +225,7 @@
           });
           reader.readAsBinaryString(myFile);
         }
+        $('.import-input > input').val('');
       },
       viewSource(url) {
         window.open(url);

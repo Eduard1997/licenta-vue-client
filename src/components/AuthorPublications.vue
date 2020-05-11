@@ -57,7 +57,7 @@
                 <span v-else>-</span></td>
               <td class="text-center">
                 <span class="badge badge-success"
-                      v-if="typeof(publication.eprint) !== 'undefined' && publication.eprint"
+                      v-if="typeof(publication.eprint) !== 'undefined' && publication.eprint && publication.eprint !== '-'"
                       @click="openUrl(publication.eprint)"
                       style="cursor: pointer">View document</span>
                 <span class="badge badge-success"
@@ -139,7 +139,7 @@
 
       <b-input-group class="mt-2">
         <template v-slot:prepend>
-          <b-input-group-text class="edit-input-text">URL</b-input-group-text>
+          <b-input-group-text class="edit-input-text">Eprint</b-input-group-text>
         </template>
         <b-form-input v-model="editModalUrl"></b-form-input>
       </b-input-group>
@@ -213,7 +213,7 @@
   import $ from 'jquery';
 
   export default {
-    components: { PulseLoader },
+    components: {PulseLoader},
     props: {
       'authorName': String,
       'authorTopData': String,
@@ -250,7 +250,7 @@
     },
     methods: {
       getAuthorPublications() {
-        if(!this.fromFile) {
+        if (!this.fromFile) {
           const path = `${this.test_url}/get-publications-for-author`;
           var data = {};
           data['authorName'] = this.authorName;
@@ -344,9 +344,9 @@
         this.editModalTitle = publicationName;
         this.editTitle = publicationName;
         this.editPublicationText = this.authorPublications[publicationName]['publication_name'];
-        this.editModalUrl = this.authorPublications[publicationName]['url'];
-        this.editScopusAggregation = this.authorPublications[publicationName]['aggregation_type_scopus'] !== 'undefined' ? this.authorPublications[publicationName]['aggregation_type_scopus'] : '-';
-        this.editScopusDescription = typeof this.authorPublications[publicationName]['subtype_description_scopus'] !== 'undefined' ? this.authorPublications[publicationName]['subtype_description_scopus'] : '-';
+        this.editModalUrl = this.authorPublications[publicationName]['eprint'];
+        this.editScopusAggregation = this.authorPublications[publicationName]['scopus_aggregation_type'] !== 'undefined' ? this.authorPublications[publicationName]['scopus_aggregation_type'] : '-';
+        this.editScopusDescription = typeof this.authorPublications[publicationName]['scopus_subtype_description'] !== 'undefined' ? this.authorPublications[publicationName]['scopus_subtype_description'] : '-';
         this.editDBLPType = typeof this.authorPublications[publicationName]['dblp_type'] !== 'undefined' ? this.authorPublications[publicationName]['dblp_type'] : '-';
         this.editDBLPVenue = typeof this.authorPublications[publicationName]['dblp_venue'] !== 'undefined' ? this.authorPublications[publicationName]['dblp_venue'] : '-';
         this.$root.$emit('bv::show::modal', 'edit-publication-modal');
@@ -357,13 +357,16 @@
         let oldPublicationName = this.editModalTitle;
         this.authorPublications[oldPublicationName]['title'] = newPublicationName;
         this.authorPublications[oldPublicationName]['publication_name'] = this.editPublicationText;
-        this.authorPublications[oldPublicationName]['url'] = this.editModalUrl;
+        this.authorPublications[oldPublicationName]['eprint'] = this.editModalUrl;
         this.authorPublications[oldPublicationName]['aggregation_type_scopus'] = this.editScopusAggregation;
-        this.authorPublications[oldPublicationName]['subtype_description_scopus'] = this.editScopusDescription;
+        this.authorPublications[oldPublicationName]['scopus_subtype_description'] = this.editScopusDescription;
         this.authorPublications[oldPublicationName]['dblp_type'] = this.editDBLPType;
         this.authorPublications[oldPublicationName]['dblp_venue'] = this.editDBLPVenue;
-        Object.defineProperty(this.authorPublications, newPublicationName, Object.getOwnPropertyDescriptor(this.authorPublications, oldPublicationName));
-        delete this.authorPublications[oldPublicationName];
+        if(oldPublicationName !== newPublicationName) {
+          Object.defineProperty(this.authorPublications, newPublicationName, Object.getOwnPropertyDescriptor(this.authorPublications, oldPublicationName));
+          delete this.authorPublications[oldPublicationName];
+        }
+        this.$forceUpdate();
         this.authorPublications = this.orderKeys(this.authorPublications);
         var index = Object.keys(this.authorPublications)
           .indexOf(newPublicationName);
