@@ -10,18 +10,22 @@
           </button>
           <button class="btn btn-sm btn-info mb-2 ml-2" v-on:click="exportData()">Export data
           </button>
+          <input id="search-table" class="form-control mb-2 ml-2" placeholder="Search title..." v-model="searchedTitle"/>
+          <button type="button" id="search-title-btn" class="btn btn-sm btn-dark mb-2 ml-2"  @click="searchTable()">Search title</button>
+          <button type="button" id="reset-table-btn" class="btn btn-sm btn-warning mb-2 ml-2"  @click="resetTable()">Show all rows</button>
         </div>
 
         <table class="table table-bordered table-responsive-xl table-hover"
                v-if="authorPublications">
           <thead class="thead-light">
           <tr>
-            <th class="text-center">Name</th>
-            <th class="text-center">Year</th>
+            <th class="text-center"><a href="javascript:;" @click="nameOrder()"
+                                       title="Order by title" v-b-tooltip.hover>Name</a></th>
+            <th class="text-center"><a href="javascript:;" @click="yearOrder()"
+                                       title="Order by year" v-b-tooltip.hover>Year</a></th>
+            <th class="text-center">Publication Name</th>
             <th class="text-center" style="white-space: nowrap">Scholar <br> - Cited By -</th>
             <th class="text-center" style="white-space: nowrap">Scholar <br> - Citations -</th>
-            <th class="text-center">Publication Name</th>
-            <th class="text-center">URL</th>
             <th class="text-center" style="white-space: nowrap">Scopus <br> - Cited By -</th>
             <th class="text-center" style="white-space: nowrap">Scopus <br> - Citations -</th>
             <th class="text-center" style="white-space: nowrap">Scopus <br> - URL -</th>
@@ -39,10 +43,28 @@
           <template v-for="publication in authorPublications">
             <tr>
               <td>
-                <a href="javascript:;" v-on:click="getCitations(publication.title)"
-                   v-b-tooltip.hover title="View document citations">{{publication.title}}</a>
+                <a v-b-tooltip.hover
+                   href="javascript:;"
+                   v-if="typeof(publication.eprint) !== 'undefined' && publication.eprint && publication.eprint !== '-'"
+                   @click="openUrl(publication.eprint)"
+                   style="cursor: pointer"
+                   title="View document">{{publication.title}}</a>
+                <a v-b-tooltip.hover
+                   href="javascript:;"
+                   v-else-if="typeof(publication.url) !== 'undefined' && publication.url"
+                   @click="openUrl(publication.url)"
+                   title="View document"
+                   style="cursor: pointer">{{publication.title}}</a>
+                <a v-b-tooltip.hover
+                   href="javascript:;"
+                   title="View document"
+                   v-else
+                   @click="documentNotAvailable()" style="cursor: pointer">{{publication.title}}</a>
               </td>
               <td class="text-center"><span v-if="publication.year">{{publication.year}}</span>
+                <span v-else>-</span></td>
+              <td class="text-center"><span
+                v-if="typeof(publication.publication_name) !== 'undefined' && publication.publication_name">{{publication.publication_name}}</span>
                 <span v-else>-</span></td>
               <td class="text-center"><span
                 v-if="typeof(publication.cited_by_scholar) !== 'undefined' && publication.cited_by_scholar">{{publication.cited_by_scholar}}</span>
@@ -52,19 +74,8 @@
                                             @click="openUrl(publication.cited_by_link_scholar)"
                                             style="cursor: pointer">View citations</span> <span
                 v-else>-</span></td>
-              <td class="text-center"><span
-                v-if="typeof(publication.publication_name) !== 'undefined' && publication.publication_name">{{publication.publication_name}}</span>
-                <span v-else>-</span></td>
-              <td class="text-center">
-                <span class="badge badge-success"
-                      v-if="typeof(publication.eprint) !== 'undefined' && publication.eprint && publication.eprint !== '-'"
-                      @click="openUrl(publication.eprint)"
-                      style="cursor: pointer">View document</span>
-                <span class="badge badge-success"
-                      v-else-if="typeof(publication.url) !== 'undefined' && publication.url"
-                      @click="openUrl(publication.url)" style="cursor: pointer">View document</span>
-                <span v-else> - </span>
-              </td>
+
+
               <td class="text-center"><span
                 v-if="typeof(publication.cited_by_scopus) !== 'undefined' && publication.cited_by_scopus">{{publication.cited_by_scopus}}</span>
                 <span v-else>-</span></td>
@@ -105,6 +116,8 @@
                    v-b-tooltip.hover title="Delete document"></i>
                 <i class="fa fa-edit edit-icon ml-2" v-on:click="editPublication(publication.title)"
                    v-b-tooltip.hover title="Edit document"></i>
+                <i class="fa fa-file-word-o citation-icon ml-2" v-on:click="getCitations(publication.title)"
+                   v-b-tooltip.hover title="View quick citations"></i>
               </td>
             </tr>
           </template>
@@ -146,32 +159,18 @@
 
       <b-input-group class="mt-2">
         <template v-slot:prepend>
-          <b-input-group-text class="edit-input-text">Scopus Aggregation Type</b-input-group-text>
+          <b-input-group-text class="edit-input-text">Scholar Citations</b-input-group-text>
         </template>
-        <b-form-input v-model="editScopusAggregation"></b-form-input>
+        <b-form-input v-model="editScholarCitations"></b-form-input>
       </b-input-group>
 
       <b-input-group class="mt-2">
         <template v-slot:prepend>
-          <b-input-group-text class="edit-input-text">Scopus Subtype Description
-          </b-input-group-text>
+          <b-input-group-text class="edit-input-text">Scopus Citations</b-input-group-text>
         </template>
-        <b-form-input v-model="editScopusDescription"></b-form-input>
+        <b-form-input v-model="editScopusCitations"></b-form-input>
       </b-input-group>
 
-      <b-input-group class="mt-2">
-        <template v-slot:prepend>
-          <b-input-group-text class="edit-input-text">DBLP Type</b-input-group-text>
-        </template>
-        <b-form-input v-model="editDBLPType"></b-form-input>
-      </b-input-group>
-
-      <b-input-group class="mt-2">
-        <template v-slot:prepend>
-          <b-input-group-text class="edit-input-text">DBLP Venue</b-input-group-text>
-        </template>
-        <b-form-input v-model="editDBLPVenue"></b-form-input>
-      </b-input-group>
     </b-modal>
 
     <b-modal id="search-publication-modal" size="xl" title="Search publication" ok-variant="success"
@@ -234,10 +233,8 @@
         editTitle: '',
         editPublicationText: '',
         editModalUrl: '',
-        editScopusAggregation: '',
-        editScopusDescription: '',
-        editDBLPType: '',
-        editDBLPVenue: '',
+        editScopusCitations: '',
+        editScholarCitations: '',
         publicationSearch: '',
         searchPubSpinner: false,
         pubResultTitle: '',
@@ -245,6 +242,8 @@
         searchNotFound: false,
         pubAlreadyExist: false,
         searchResponse: '',
+        titleAscending: true,
+        searchedTitle: '',
         citationsArray: {}
       };
     },
@@ -345,10 +344,8 @@
         this.editTitle = publicationName;
         this.editPublicationText = this.authorPublications[publicationName]['publication_name'];
         this.editModalUrl = this.authorPublications[publicationName]['eprint'];
-        this.editScopusAggregation = this.authorPublications[publicationName]['scopus_aggregation_type'] !== 'undefined' ? this.authorPublications[publicationName]['scopus_aggregation_type'] : '-';
-        this.editScopusDescription = typeof this.authorPublications[publicationName]['scopus_subtype_description'] !== 'undefined' ? this.authorPublications[publicationName]['scopus_subtype_description'] : '-';
-        this.editDBLPType = typeof this.authorPublications[publicationName]['dblp_type'] !== 'undefined' ? this.authorPublications[publicationName]['dblp_type'] : '-';
-        this.editDBLPVenue = typeof this.authorPublications[publicationName]['dblp_venue'] !== 'undefined' ? this.authorPublications[publicationName]['dblp_venue'] : '-';
+        this.editScholarCitations = this.authorPublications[publicationName]['cited_by_scholar'];
+        this.editScopusCitations = this.authorPublications[publicationName]['cited_by_scopus'];
         this.$root.$emit('bv::show::modal', 'edit-publication-modal');
       },
       saveEditData() {
@@ -358,11 +355,9 @@
         this.authorPublications[oldPublicationName]['title'] = newPublicationName;
         this.authorPublications[oldPublicationName]['publication_name'] = this.editPublicationText;
         this.authorPublications[oldPublicationName]['eprint'] = this.editModalUrl;
-        this.authorPublications[oldPublicationName]['aggregation_type_scopus'] = this.editScopusAggregation;
-        this.authorPublications[oldPublicationName]['scopus_subtype_description'] = this.editScopusDescription;
-        this.authorPublications[oldPublicationName]['dblp_type'] = this.editDBLPType;
-        this.authorPublications[oldPublicationName]['dblp_venue'] = this.editDBLPVenue;
-        if(oldPublicationName !== newPublicationName) {
+        this.authorPublications[oldPublicationName]['cited_by_scholar'] = this.editScholarCitations;
+        this.authorPublications[oldPublicationName]['cited_by_scopus'] = this.editScopusCitations;
+        if (oldPublicationName !== newPublicationName) {
           Object.defineProperty(this.authorPublications, newPublicationName, Object.getOwnPropertyDescriptor(this.authorPublications, oldPublicationName));
           delete this.authorPublications[oldPublicationName];
         }
@@ -487,8 +482,115 @@
         document.body.appendChild(element);
         element.click();
         document.body.removeChild(element);
+      },
+      documentNotAvailable() {
+        this.$swal({
+          title: 'Sorry',
+          text: 'Document not available',
+          icon: 'warning',
+          showCancelButton: false,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Close'
+        })
+      },
+      sortByTitle(data, attr) {
+        var self = this;
+        self.titleAscending = !self.titleAscending;
+        var arr = [];
+        for (var prop in data) {
+          if (data.hasOwnProperty(prop)) {
+            var obj = {};
+            obj[prop] = data[prop];
+            obj.tempSortName = data[prop][attr].toLowerCase();
+            arr.push(obj);
+          }
+        }
+
+        arr.sort(function(a, b) {
+          var at = a.tempSortName,
+            bt = b.tempSortName;
+          if(self.titleAscending === true) {
+            return at > bt ? 1 : ( at < bt ? -1 : 0 );
+          } else {
+            return at < bt ? 1 : ( at > bt ? -1 : 0 );
+          }
+
+        });
+
+        var result = [];
+        for (var i=0, l=arr.length; i<l; i++) {
+          var obj = arr[i];
+          delete obj.tempSortName;
+          for (var prop in obj) {
+            if (obj.hasOwnProperty(prop)) {
+              var id = prop;
+            }
+          }
+          var item = obj[id];
+          result.push(item);
+        }
+        return result;
+      },
+      sortByYear(data, attr) {
+        var self = this;
+        self.yearAscending = !self.yearAscending;
+        var arr = [];
+        for (var prop in data) {
+          if (data.hasOwnProperty(prop)) {
+            var obj = {};
+            obj[prop] = data[prop];
+            obj.tempSortName = data[prop][attr].toLowerCase();
+            arr.push(obj);
+          }
+        }
+
+        arr.sort(function(a, b) {
+          var at = a.tempSortName,
+            bt = b.tempSortName;
+          if(self.yearAscending === true) {
+            return at > bt ? 1 : ( at < bt ? -1 : 0 );
+          } else {
+            return at < bt ? 1 : ( at > bt ? -1 : 0 );
+          }
+
+        });
+
+        var result = [];
+        for (var i=0, l=arr.length; i<l; i++) {
+          var obj = arr[i];
+          delete obj.tempSortName;
+          for (var prop in obj) {
+            if (obj.hasOwnProperty(prop)) {
+              var id = prop;
+            }
+          }
+          var item = obj[id];
+          result.push(item);
+        }
+        return result;
+      },
+      nameOrder() {
+        this.authorPublications = this.sortByTitle(this.authorPublications, 'title');
+      },
+      yearOrder() {
+        this.authorPublications = this.sortByYear(this.authorPublications, 'year');
+      },
+      searchTable() {
+        $('tr').show();
+        var self = this;
+        $.each(this.authorPublications, function(key, value) {
+          if(!value.title.includes(self.searchedTitle)) {
+            var index = Object.keys(self.authorPublications).indexOf(value.title);
+            $('tr').eq(index+1).hide();
+          }
+        })
+      },
+      resetTable() {
+        $('tr').show();
       }
     },
+
     created() {
       this.getAuthorPublications();
     }
@@ -522,6 +624,13 @@
     color: dodgerblue;
     font-size: 21px;
     cursor: pointer;
+  }
+
+  .citation-icon {
+    color: green;
+    font-size: 21px;
+    cursor: pointer;
+    margin-top: 7px;
   }
 
   .edit-input-text {
