@@ -577,17 +577,18 @@
         this.authorPublications = this.sortByYear(this.authorPublications, 'year');
       },
       searchTable() {
-        $('tr').show();
+        $('tbody>tr').show();
         var self = this;
         $.each(this.authorPublications, function(key, value) {
-          if(!value.title.includes(self.searchedTitle)) {
+          if(value.title.toLowerCase().search(self.searchedTitle.toLowerCase()) == -1) {
             var index = Object.keys(self.authorPublications).indexOf(value.title);
-            $('tr').eq(index+1).hide();
+            $('tbody > tr').eq(index).hide();
           }
         })
       },
       resetTable() {
-        $('tr').show();
+        $('tbody>tr').show();
+        this.searchedTitle = '';
       }
     },
 
