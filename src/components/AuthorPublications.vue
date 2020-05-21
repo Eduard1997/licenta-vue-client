@@ -116,7 +116,7 @@
                    v-b-tooltip.hover title="Delete document"></i>
                 <i class="fa fa-edit edit-icon ml-2" v-on:click="editPublication(publication.title)"
                    v-b-tooltip.hover title="Edit document"></i>
-                <i class="fa fa-file-word-o citation-icon ml-2" v-on:click="getCitations(publication.title)"
+                <i class="fa fa-file-word-o citation-icon ml-2" v-on:click="getCitations(publication.title, publication.cited_by_link_scholar)"
                    v-b-tooltip.hover title="View quick citations"></i>
               </td>
             </tr>
@@ -268,7 +268,7 @@
       openUrl(url) {
         window.open(url);
       },
-      getCitations(publicationName) {
+      getCitations(publicationName, scholarLink) {
         this.$root.$emit('bv::show::modal', 'citations-modal');
         this.modalTitle = 'Citations for: ' + publicationName;
         $('.modal-content-citations')
@@ -281,6 +281,12 @@
           var data = {};
           data['publicationName'] = publicationName;
           data['authorName'] = this.authorName;
+          if(typeof scholarLink !== 'undefined') {
+            data['scholarURL'] = scholarLink;
+          } else {
+            data['scholarURL'] = '-'
+          }
+
           axios.post(path, data)
             .then((response) => {
               $('.modal-spinner')
