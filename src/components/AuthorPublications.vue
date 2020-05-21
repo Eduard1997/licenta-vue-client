@@ -10,9 +10,14 @@
           </button>
           <button class="btn btn-sm btn-info mb-2 ml-2" v-on:click="exportData()">Export data
           </button>
-          <input id="search-table" class="form-control mb-2 ml-2" placeholder="Search title..." v-model="searchedTitle"/>
-          <button type="button" id="search-title-btn" class="btn btn-sm btn-dark mb-2 ml-2"  @click="searchTable()">Search title</button>
-          <button type="button" id="reset-table-btn" class="btn btn-sm btn-warning mb-2 ml-2"  @click="resetTable()">Show all rows</button>
+          <input id="search-table" class="form-control mb-2 ml-2" placeholder="Search title..."
+                 v-model="searchedTitle"/>
+          <button type="button" id="search-title-btn" class="btn btn-sm btn-dark mb-2 ml-2"
+                  @click="searchTable()">Search title
+          </button>
+          <button type="button" id="reset-table-btn" class="btn btn-sm btn-warning mb-2 ml-2"
+                  @click="resetTable()">Show all rows
+          </button>
         </div>
 
         <table class="table table-bordered table-responsive-xl table-hover"
@@ -116,7 +121,8 @@
                    v-b-tooltip.hover title="Delete document"></i>
                 <i class="fa fa-edit edit-icon ml-2" v-on:click="editPublication(publication.title)"
                    v-b-tooltip.hover title="Edit document"></i>
-                <i class="fa fa-file-word-o citation-icon ml-2" v-on:click="getCitations(publication.title, publication.cited_by_link_scholar)"
+                <i class="fa fa-file-word-o citation-icon ml-2"
+                   v-on:click="getCitations(publication.title, publication.cited_by_link_scholar)"
                    v-b-tooltip.hover title="View quick citations"></i>
               </td>
             </tr>
@@ -131,7 +137,51 @@
                    style="margin: auto; display: none"></b-spinner>
       </div>
       <div class="modal-content-citations">
-
+        <b-alert variant="danger" v-if="citationsAlert" show>No citations found!</b-alert>
+        <table class="table table-bordered table-responsive-xl table-hover" v-if="showScolarTable">
+          <thead class="thead-light">
+            <tr>
+              <th>Title</th>
+              <th>Cited By Scholar</th>
+              <th>Cited no. Scholar</th>
+              <th>URL</th>
+              <th>Year</th>
+            </tr>
+          </thead>
+          <tbody>
+            <template v-for="item in this.citationsArray[this.usedCitationTitle]">
+              <tr>
+                <td>{{item.title}}</td>
+                <td><span class="badge badge-warning" style="cursor: pointer" @click="openUrl(item.cited_by_link_scholar)">View citations</span></td>
+                <td>{{item.cited_by_scholar}}</td>
+                <td><span class="badge badge-success" style="cursor: pointer" @click="openUrl(item.eprint)">View document</span></td>
+                <td>{{item.year}}</td>
+              </tr>
+            </template>
+          </tbody>
+        </table>
+        <table class="table table-bordered table-responsive-xl table-hover" v-if="showSemmanticTable">
+          <thead class="thead-light">
+          <tr>
+            <th>Title</th>
+            <th>Year</th>
+            <th>URL</th>
+            <th>Authors</th>
+            <th>Domains</th>
+          </tr>
+          </thead>
+          <tbody>
+          <template v-for="item in this.citationsArray[this.usedCitationTitle]">
+            <tr>
+              <td>{{item.title}}</td>
+              <td>{{item.year}}</td>
+              <td><span class="badge badge-warning" style="cursor: pointer" @click="openUrl(item.link)">View document</span></td>
+              <td>{{item.authors}}</td>
+              <td>{{item.domains}}</td>
+            </tr>
+          </template>
+          </tbody>
+        </table>
       </div>
     </b-modal>
     <b-modal id="edit-publication-modal" size="xl" :title="editModalTitle" :ok-title="'Save'"
@@ -244,6 +294,10 @@
         searchResponse: '',
         titleAscending: true,
         searchedTitle: '',
+        usedCitationTitle: '',
+        showScolarTable: false,
+        citationsAlert: true,
+        showSemmanticTable: false,
         citationsArray: {}
       };
     },
@@ -271,17 +325,18 @@
       getCitations(publicationName, scholarLink) {
         this.$root.$emit('bv::show::modal', 'citations-modal');
         this.modalTitle = 'Citations for: ' + publicationName;
-        $('.modal-content-citations')
-          .empty();
-        $('.modal-spinner')
-          .show();
+        this.usedCitationTitle = publicationName;
+        this.showScolarTable = false;
+        this.showSemmanticTable = false;
+        this.citationsAlert = false;
+        $('.modal-spinner').show();
 
         if (typeof this.citationsArray[publicationName] === 'undefined') {
           const path = `${this.test_url}/get-citations-for-publication`;
           var data = {};
           data['publicationName'] = publicationName;
           data['authorName'] = this.authorName;
-          if(typeof scholarLink !== 'undefined') {
+          if (typeof scholarLink !== 'undefined') {
             data['scholarURL'] = scholarLink;
           } else {
             data['scholarURL'] = '-'
@@ -289,40 +344,30 @@
 
           axios.post(path, data)
             .then((response) => {
-              $('.modal-spinner')
-                .hide();
-              if (typeof response.data.message !== 'undefined') {
-                var alertHtml = '<div class="alert alert-danger">' + response.data.message + '</div>';
-                $('.modal-content-citations')
-                  .append(alertHtml);
-                this.citationsArray[publicationName] = response.data.message;
+              $('.modal-spinner').hide();
+              if (typeof response.data.semantic_citations !== 'undefined') {
+                if (typeof response.data.semantic_citations.message !== 'undefined') {
+                  this.citationsAlert = true;
+                } else {
+                  this.citationsArray[publicationName] = response.data.semantic_citations;
+                  this.showSemmanticTable = true;
+                }
               } else {
-                $.each(response.data, function (key, value) {
-                  var title = value['title'];
-                  var link = value['link'];
-                  var HTML = '<div><a href="' + link + '">' + title + '</a></div>';
-                  $('.modal-content-citations')
-                    .append(HTML);
-                });
-                this.citationsArray[publicationName] = response.data;
+                if (typeof response.data.scholar_citations !== 'undefined') {
+                  this.citationsArray[publicationName] = response.data.scholar_citations.publications;
+                  this.showScolarTable = true;
+                }
+
               }
             });
         } else {
-          $('.modal-spinner')
-            .hide();
-          if (typeof this.citationsArray[publicationName] === 'object') {
-            $.each(this.citationsArray[publicationName], function (key, value) {
-              var title = value['title'];
-              var link = value['link'];
-              var HTML = '<div><a href="' + link + '">' + title + '</a></div>';
-              $('.modal-content-citations')
-                .append(HTML);
-            });
+          $('.modal-spinner').hide();
+          if(typeof this.citationsArray[this.usedCitationTitle]['show_semantic'] !== 'undefined') {
+            this.showSemmanticTable = true;
           } else {
-            var alertHtml = '<div class="alert alert-danger">' + this.citationsArray[publicationName] + '</div>';
-            $('.modal-content-citations')
-              .append(alertHtml);
+            this.showScolarTable = true;
           }
+
         }
       },
       deletePublication(publicationName) {
@@ -397,20 +442,12 @@
         var index = Object.keys(this.authorPublications)
           .indexOf(this.searchResponse[Object.keys(this.searchResponse)[0]].title);
         setTimeout(function () {
-          $('tr')
-            .eq(index + 1)
-            .addClass('table-success');
-          $('tr')
-            .eq(index + 1)
-            .attr('id', 'scroll-to');
+          $('tr').eq(index + 1).addClass('table-success');
+          $('tr').eq(index + 1).attr('id', 'scroll-to');
           window.location.href = '#scroll-to';
           setTimeout(function () {
-            $('tr')
-              .eq(index + 1)
-              .removeClass('table-success');
-            $('tr')
-              .eq(index + 1)
-              .removeAttr('id');
+            $('tr').eq(index + 1).removeClass('table-success');
+            $('tr').eq(index + 1).removeAttr('id');
           }, 3000);
           this.searchResponse = '';
         }, 1000);
@@ -513,19 +550,19 @@
           }
         }
 
-        arr.sort(function(a, b) {
+        arr.sort(function (a, b) {
           var at = a.tempSortName,
             bt = b.tempSortName;
-          if(self.titleAscending === true) {
-            return at > bt ? 1 : ( at < bt ? -1 : 0 );
+          if (self.titleAscending === true) {
+            return at > bt ? 1 : (at < bt ? -1 : 0);
           } else {
-            return at < bt ? 1 : ( at > bt ? -1 : 0 );
+            return at < bt ? 1 : (at > bt ? -1 : 0);
           }
 
         });
 
         var result = [];
-        for (var i=0, l=arr.length; i<l; i++) {
+        for (var i = 0, l = arr.length; i < l; i++) {
           var obj = arr[i];
           delete obj.tempSortName;
           for (var prop in obj) {
@@ -551,19 +588,19 @@
           }
         }
 
-        arr.sort(function(a, b) {
+        arr.sort(function (a, b) {
           var at = a.tempSortName,
             bt = b.tempSortName;
-          if(self.yearAscending === true) {
-            return at > bt ? 1 : ( at < bt ? -1 : 0 );
+          if (self.yearAscending === true) {
+            return at > bt ? 1 : (at < bt ? -1 : 0);
           } else {
-            return at < bt ? 1 : ( at > bt ? -1 : 0 );
+            return at < bt ? 1 : (at > bt ? -1 : 0);
           }
 
         });
 
         var result = [];
-        for (var i=0, l=arr.length; i<l; i++) {
+        for (var i = 0, l = arr.length; i < l; i++) {
           var obj = arr[i];
           delete obj.tempSortName;
           for (var prop in obj) {
@@ -585,8 +622,8 @@
       searchTable() {
         $('tbody>tr').show();
         var self = this;
-        $.each(this.authorPublications, function(key, value) {
-          if(value.title.toLowerCase().search(self.searchedTitle.toLowerCase()) == -1) {
+        $.each(this.authorPublications, function (key, value) {
+          if (value.title.toLowerCase().search(self.searchedTitle.toLowerCase()) == -1) {
             var index = Object.keys(self.authorPublications).indexOf(value.title);
             $('tbody > tr').eq(index).hide();
           }
