@@ -11,7 +11,7 @@
           <button class="btn btn-sm btn-info mb-2 ml-2" v-on:click="exportData()">Export data
           </button>
           <input id="search-table" class="form-control mb-2 ml-2" placeholder="Search title..."
-                 v-model="searchedTitle"/>
+                 v-model="searchedTitle" v-on:keyup.enter="searchTable()"/>
           <button type="button" id="search-title-btn" class="btn btn-sm btn-dark mb-2 ml-2"
                   @click="searchTable()">Search title
           </button>
@@ -138,24 +138,44 @@
       </div>
       <div class="modal-content-citations">
         <b-alert variant="danger" v-if="citationsAlert" show>No citations found!</b-alert>
-        <table class="table table-bordered table-responsive-xl table-hover" v-if="showScolarTable">
+        <table class="table table-bordered table-responsive-xl table-hover scholar-ciations-table" v-if="showScolarTable">
           <thead class="thead-light">
             <tr>
               <th>Title</th>
-              <th>Cited By Scholar</th>
-              <th>Cited no. Scholar</th>
-              <th>URL</th>
               <th>Year</th>
+              <th>Cited no. Scholar</th>
+              <th>Cited By Scholar</th>
+              <th>URL</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
             <template v-for="item in this.citationsArray[this.usedCitationTitle]">
               <tr>
-                <td>{{item.title}}</td>
-                <td><span class="badge badge-warning" style="cursor: pointer" @click="openUrl(item.cited_by_link_scholar)">View citations</span></td>
-                <td>{{item.cited_by_scholar}}</td>
-                <td><span class="badge badge-success" style="cursor: pointer" @click="openUrl(item.eprint)">View document</span></td>
-                <td>{{item.year}}</td>
+                <td>
+                  <span :class="'title-' + item.title">{{item.title}}</span>
+                  <b-input v-model="item.title" :name="item.title" style="display: none"></b-input>
+                </td>
+                <td>
+                  <span :class="'title-' + item.title">{{item.year}}</span>
+                  <b-input v-model="item.year" :name="item.title" style="display: none"></b-input>
+                </td>
+                <td>
+                  <span :class="'title-' + item.title">{{item.cited_by_scholar}}</span>
+                  <b-input v-model="item.cited_by_scholar" :name="item.title" style="display: none"></b-input>
+                </td>
+                <td>
+                  <span class="badge badge-warning" :data-id="item.title" style="cursor: pointer" @click="openUrl(item.cited_by_link_scholar)">View citations</span>
+                  <b-input v-model="item.cited_by_link_scholar" :name="item.title" style="display: none"></b-input>
+                </td>
+                <td>
+                  <span class="badge badge-success" :data-id="item.title" style="cursor: pointer" @click="openUrl(item.eprint)">View document</span>
+                  <b-input v-model="item.eprint" :name="item.title" style="display: none"></b-input>
+                </td>
+                <td>
+                  <i title="Edit citation" :data-id="'icon-edit-' + item.title" v-b-tooltip.hover class="fa fa-edit citation-icon" style="color: #2a80ff !important;" @click="editCitationsData(item.title)"></i>
+                  <i title="Edit citation" :data-id="'icon-submit-' + item.title" v-b-tooltip.hover class="fa fa-check citation-icon" style="display: none" @click="confirmCitationData(item.title)"></i>
+                </td>
               </tr>
             </template>
           </tbody>
@@ -416,20 +436,12 @@
         this.authorPublications = this.orderKeys(this.authorPublications);
         var index = Object.keys(this.authorPublications)
           .indexOf(newPublicationName);
-        $('tr')
-          .eq(index + 1)
-          .addClass('table-success');
-        $('tr')
-          .eq(index + 1)
-          .attr('id', 'scroll-to');
+        $('tr').eq(index + 1).addClass('table-success');
+        $('tr').eq(index + 1).attr('id', 'scroll-to');
         window.location.href = '#scroll-to';
         setTimeout(function () {
-          $('tr')
-            .eq(index + 1)
-            .removeClass('table-success');
-          $('tr')
-            .eq(index + 1)
-            .removeAttr('id');
+          $('tr').eq(index + 1).removeClass('table-success');
+          $('tr').eq(index + 1).removeAttr('id');
         }, 3000);
       },
       showSearchPubModal() {
@@ -632,6 +644,25 @@
       resetTable() {
         $('tbody>tr').show();
         this.searchedTitle = '';
+      },
+      editCitationsData(title) {
+        var editButtonId = 'icon-edit-' + title;
+        var submitButtonId = 'icon-submit-' + title;
+        $("input[name='" +title+ "']").show();
+        $("span[class='title-" +title+ "']").hide();
+        $('span[data-id="'+title+'"]').hide();
+        $('i[data-id="'+editButtonId+'"]').hide();
+        $('i[data-id="'+submitButtonId+'"]').show();
+      },
+      confirmCitationData(title) {
+        var editButtonId = 'icon-edit-' + title;
+        var submitButtonId = 'icon-submit-' + title;
+        $("input[name='" +title+ "']").hide();
+        $("span[class='title-" +title+ "']").show();
+        $('span[data-id="'+title+'"]').show();
+        $('i[data-id="'+editButtonId+'"]').show();
+        $('i[data-id="'+submitButtonId+'"]').hide();
+        this.$forceUpdate();
       }
     },
 
@@ -684,5 +715,6 @@
   .success-border {
     box-shadow: 0 0 0 3px green;
   }
+
 </style>
 
