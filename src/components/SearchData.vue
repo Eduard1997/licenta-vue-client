@@ -127,10 +127,8 @@
     </div>
     <div class="container-fluid mt-2">
       <author-publications v-if="showPublications" :authorName="authorName"
-                           :authorTopData="responseSearchAuthor" :fromFile="fromFile" :filePublications="authorPublications"></author-publications>
+                           :authorTopData="responseSearchAuthor" :fromFile="fromFile" :filePublications="authorPublications" :fileCitations="citationsArray"></author-publications>
     </div>
-
-
   </div>
 </template>
 
@@ -154,6 +152,7 @@
         size: '20px',
         responseSearchAuthor: '',
         authorPublications: '',
+        citationsArray: '',
         alertText: '',
         publicationsVisible: false,
         publicationsSpinner: false,
@@ -219,6 +218,7 @@
             decodedData = JSON.parse(e.target.result);
             self.responseSearchAuthor = decodedData['topData'];
             self.authorPublications = decodedData['authorPublications'];
+            self.citationsArray = decodedData['citationsData']
             self.showPublications = true;
             self.displayAuthor = true;
 

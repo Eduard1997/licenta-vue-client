@@ -137,62 +137,76 @@
                    style="margin: auto; display: none"></b-spinner>
       </div>
       <div class="modal-content-citations">
-        <b-alert variant="danger" v-if="citationsAlert" show>No citations found!</b-alert>
-        <table class="table table-bordered table-responsive-xl table-hover scholar-ciations-table" v-if="showScolarTable">
+        <b-alert variant="danger" v-if="citationsAlert && !showScolarTable" show>No citations found!</b-alert>
+        <table class="table table-bordered table-responsive-xl table-hover scholar-ciations-table"
+               v-if="showScolarTable && !citationsAlert">
           <thead class="thead-light">
-            <tr>
-              <th>Title</th>
-              <th>Year</th>
-              <th>Authors</th>
-              <th>Domains</th>
-              <th>Cited no. Scholar</th>
-              <th>Cited By Scholar</th>
-              <th>URL</th>
-              <th>Actions</th>
-            </tr>
+          <tr>
+            <th>Title</th>
+            <th>Year</th>
+            <th>Authors</th>
+            <th>Domains</th>
+            <th>Cited no. Scholar</th>
+            <th>Cited By Scholar</th>
+            <th>URL</th>
+            <th>Actions</th>
+          </tr>
           </thead>
           <tbody>
-            <template v-for="item in this.citationsArray[this.usedCitationTitle]">
-              <tr>
-                <td>
-                  <span :class="'title-' + item.title">{{item.title}}</span>
-                  <b-input v-model="item.title" :name="item.title" style="display: none"></b-input>
-                </td>
-                <td>
-                  <span :class="'title-' + item.title">{{item.year}}</span>
-                  <b-input v-model="item.year" :name="item.title" style="display: none"></b-input>
-                </td>
-                <td>
-                  <span :class="'authors-' + item.title">{{item.authors}}</span>
-                  <b-input v-model="item.authors" :name="item.title" style="display: none"></b-input>
-                </td>
-                <td>
-                  <span v-if="typeof item.domains !== 'undefined'" :class="'domains-' + item.title">{{item.domains}}</span>
-                  <span v-else :class="'domains-' + item.title">-</span>
-                  <b-input v-model="item.domains" :name="item.title" style="display: none"></b-input>
-                </td>
-                <td>
-                  <span v-if="typeof item.cited_by_scholar !== 'undefined'" :class="'title-' + item.title">{{item.cited_by_scholar}}</span>
-                  <span v-else :class="'title-' + item.title">-</span>
-                  <b-input v-model="item.cited_by_scholar" :name="item.title" style="display: none"></b-input>
-                </td>
-                <td>
-                  <span v-if="typeof item.cited_by_link_scholar !== 'undefined'" class="badge badge-warning" :data-id="item.title" style="cursor: pointer" @click="openUrl(item.cited_by_link_scholar)">View citations</span>
-                  <span v-else :data-id="item.title" style="cursor: pointer">-</span>
-                  <b-input v-model="item.cited_by_link_scholar" :name="item.title" style="display: none"></b-input>
-                </td>
-                <td>
-                  <span v-if="typeof item.eprint !== 'undefined'" class="badge badge-success" :data-id="item.title" style="cursor: pointer" @click="openUrl(item.eprint)">View document</span>
-                  <span v-else-if="typeof item.link !== 'undefined'" class="badge badge-success" :data-id="item.title" style="cursor: pointer" @click="openUrl(item.link)">View document</span>
-                  <b-input v-if="typeof item.eprint !== 'undefined'" v-model="item.eprint" :name="item.title" style="display: none"></b-input>
-                  <b-input v-else-if="typeof item.link !== 'undefined'" v-model="item.link" :name="item.title" style="display: none"></b-input>
-                </td>
-                <td>
-                  <i title="Edit citation" :data-id="'icon-edit-' + item.title" v-b-tooltip.hover class="fa fa-edit citation-icon" style="color: #2a80ff !important;" @click="editCitationsData(item.title)"></i>
-                  <i title="Edit citation" :data-id="'icon-submit-' + item.title" v-b-tooltip.hover class="fa fa-check citation-icon" style="display: none" @click="confirmCitationData(item.title)"></i>
-                </td>
-              </tr>
-            </template>
+          <template v-for="(item, key) in this.citationsArray[this.usedCitationTitle]">
+            <tr v-if="key !== 'message'">
+              <td>
+                <span :class="'title-' + item.title">{{item.title}}</span>
+                <b-input v-model="item.title" :name="item.title" style="display: none"></b-input>
+              </td>
+              <td>
+                <span :class="'title-' + item.title">{{item.year}}</span>
+                <b-input v-model="item.year" :name="item.title" style="display: none"></b-input>
+              </td>
+              <td>
+                <span :class="'authors-' + item.title">{{item.authors}}</span>
+                <b-input v-model="item.authors" :name="item.title" style="display: none"></b-input>
+              </td>
+              <td>
+                <span v-if="typeof item.domains !== 'undefined'" :class="'domains-' + item.title">{{item.domains}}</span>
+                <span v-else :class="'domains-' + item.title">-</span>
+                <b-input v-model="item.domains" :name="item.title" style="display: none"></b-input>
+              </td>
+              <td>
+                <span v-if="typeof item.cited_by_scholar !== 'undefined'"
+                      :class="'title-' + item.title">{{item.cited_by_scholar}}</span>
+                <span v-else :class="'title-' + item.title">-</span>
+                <b-input v-model="item.cited_by_scholar" :name="item.title"
+                         style="display: none"></b-input>
+              </td>
+              <td>
+                <span v-if="typeof item.cited_by_link_scholar !== 'undefined'"
+                      class="badge badge-warning" :data-id="item.title" style="cursor: pointer"
+                      @click="openUrl(item.cited_by_link_scholar)">View citations</span>
+                <span v-else :data-id="item.title" style="cursor: pointer">-</span>
+                <b-input v-model="item.cited_by_link_scholar" :name="item.title"
+                         style="display: none"></b-input>
+              </td>
+              <td>
+                <span v-if="typeof item.eprint !== 'undefined'" class="badge badge-success"
+                      :data-id="item.title" style="cursor: pointer" @click="openUrl(item.eprint)">View document</span>
+                <span v-else-if="typeof item.link !== 'undefined'" class="badge badge-success"
+                      :data-id="item.title" style="cursor: pointer" @click="openUrl(item.link)">View document</span>
+                <b-input v-if="typeof item.eprint !== 'undefined'" v-model="item.eprint"
+                         :name="item.title" style="display: none"></b-input>
+                <b-input v-else-if="typeof item.link !== 'undefined'" v-model="item.link"
+                         :name="item.title" style="display: none"></b-input>
+              </td>
+              <td>
+                <i title="Edit citation" :data-id="'icon-edit-' + item.title" v-b-tooltip.hover
+                   class="fa fa-edit citation-icon" style="color: #2a80ff !important;"
+                   @click="editCitationsData(item.title)"></i>
+                <i title="Edit citation" :data-id="'icon-submit-' + item.title" v-b-tooltip.hover
+                   class="fa fa-check citation-icon" style="display: none"
+                   @click="confirmCitationData(item.title)"></i>
+              </td>
+            </tr>
+          </template>
           </tbody>
         </table>
       </div>
@@ -279,6 +293,7 @@
     props: {
       'authorName': String,
       'authorTopData': String,
+      'fileCitations': Object,
       'fromFile': Boolean,
       "filePublications": Object
     },
@@ -329,6 +344,7 @@
         } else {
           this.loading = false;
           this.authorPublications = this.filePublications;
+          this.citationsArray = this.fileCitations;
         }
       },
       openUrl(url) {
@@ -356,19 +372,31 @@
           axios.post(path, data)
             .then((response) => {
               $('.modal-spinner').hide();
-                if (typeof response.data.scholar_citations !== 'undefined') {
+              if (typeof response.data.scholar_citations !== 'undefined') {
+                if(typeof response.data.scholar_citations.publications.message !== 'undefined' && Object.keys(response.data.scholar_citations.publications).length === 1) {
+                  this.citationsAlert = true;
+                  this.showScolarTable = false;
+                  this.citationsArray[publicationName] = response.data.scholar_citations.publications.message;
+                } else {
                   this.citationsArray[publicationName] = response.data.scholar_citations.publications;
                   this.showScolarTable = true;
+                  this.citationsAlert = false;
                 }
+
+              }
             });
         } else {
           $('.modal-spinner').hide();
-          if(typeof this.citationsArray[this.usedCitationTitle]['show_semantic'] !== 'undefined') {
-            this.showSemmanticTable = true;
+
+          if(this.citationsArray[publicationName] === 'Article not found on Semantic Scholar') {
+            this.citationsAlert = true;
+            this.showScolarTable = false;
           } else {
+            this.citationsAlert = false;
             this.showScolarTable = true;
           }
 
+          //this.$root.$emit('bv::show::modal', 'citations-modal');
         }
       },
       deletePublication(publicationName) {
@@ -510,6 +538,7 @@
         var data = {};
         data['topData'] = this.authorTopData;
         data['authorPublications'] = this.authorPublications;
+        data['citationsData'] = this.citationsArray;
         var encoded_data = JSON.stringify(data);
         var element = document.createElement('a');
         element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(encoded_data));
@@ -608,9 +637,12 @@
       },
       nameOrder() {
         this.authorPublications = this.sortByTitle(this.authorPublications, 'title');
+        this.renameAuthorPubArray();
+
       },
       yearOrder() {
         this.authorPublications = this.sortByYear(this.authorPublications, 'year');
+        this.renameAuthorPubArray();
       },
       searchTable() {
         $('tbody>tr').show();
@@ -629,25 +661,33 @@
       editCitationsData(title) {
         var editButtonId = 'icon-edit-' + title;
         var submitButtonId = 'icon-submit-' + title;
-        $("input[name='" +title+ "']").show();
-        $("span[class='title-" +title+ "']").hide();
-        $("span[class='authors-" +title+ "']").hide();
-        $('span[data-id="'+title+'"]').hide();
-        $("span[class='domains-" +title+ "']").hide();
-        $('i[data-id="'+editButtonId+'"]').hide();
-        $('i[data-id="'+submitButtonId+'"]').show();
+        $("input[name='" + title + "']").show();
+        $("span[class='title-" + title + "']").hide();
+        $("span[class='authors-" + title + "']").hide();
+        $('span[data-id="' + title + '"]').hide();
+        $("span[class='domains-" + title + "']").hide();
+        $('i[data-id="' + editButtonId + '"]').hide();
+        $('i[data-id="' + submitButtonId + '"]').show();
       },
       confirmCitationData(title) {
         var editButtonId = 'icon-edit-' + title;
         var submitButtonId = 'icon-submit-' + title;
-        $("input[name='" +title+ "']").hide();
-        $("span[class='authors-" +title+ "']").show();
-        $("span[class='title-" +title+ "']").show();
-        $("span[class='domains-" +title+ "']").show();
-        $('span[data-id="'+title+'"]').show();
-        $('i[data-id="'+editButtonId+'"]').show();
-        $('i[data-id="'+submitButtonId+'"]').hide();
+
+        $("input[name='" + title + "']").hide();
+        $("span[class='authors-" + title + "']").show();
+        $("span[class='title-" + title + "']").show();
+        $("span[class='domains-" + title + "']").show();
+        $('span[data-id="' + title + '"]').show();
+        $('i[data-id="' + editButtonId + '"]').show();
+        $('i[data-id="' + submitButtonId + '"]').hide();
         this.$forceUpdate();
+      },
+      renameAuthorPubArray() {
+        var data_arr = {};
+        $.each(this.authorPublications, (key, data) => {
+          data_arr[data.title] = data;
+        });
+        this.authorPublications = data_arr;
       }
     },
 
