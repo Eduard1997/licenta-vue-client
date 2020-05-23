@@ -143,6 +143,8 @@
             <tr>
               <th>Title</th>
               <th>Year</th>
+              <th>Authors</th>
+              <th>Domains</th>
               <th>Cited no. Scholar</th>
               <th>Cited By Scholar</th>
               <th>URL</th>
@@ -161,16 +163,29 @@
                   <b-input v-model="item.year" :name="item.title" style="display: none"></b-input>
                 </td>
                 <td>
-                  <span :class="'title-' + item.title">{{item.cited_by_scholar}}</span>
+                  <span :class="'authors-' + item.title">{{item.authors}}</span>
+                  <b-input v-model="item.authors" :name="item.title" style="display: none"></b-input>
+                </td>
+                <td>
+                  <span v-if="typeof item.domains !== 'undefined'" :class="'domains-' + item.title">{{item.domains}}</span>
+                  <span v-else :class="'domains-' + item.title">-</span>
+                  <b-input v-model="item.domains" :name="item.title" style="display: none"></b-input>
+                </td>
+                <td>
+                  <span v-if="typeof item.cited_by_scholar !== 'undefined'" :class="'title-' + item.title">{{item.cited_by_scholar}}</span>
+                  <span v-else :class="'title-' + item.title">-</span>
                   <b-input v-model="item.cited_by_scholar" :name="item.title" style="display: none"></b-input>
                 </td>
                 <td>
-                  <span class="badge badge-warning" :data-id="item.title" style="cursor: pointer" @click="openUrl(item.cited_by_link_scholar)">View citations</span>
+                  <span v-if="typeof item.cited_by_link_scholar !== 'undefined'" class="badge badge-warning" :data-id="item.title" style="cursor: pointer" @click="openUrl(item.cited_by_link_scholar)">View citations</span>
+                  <span v-else :data-id="item.title" style="cursor: pointer">-</span>
                   <b-input v-model="item.cited_by_link_scholar" :name="item.title" style="display: none"></b-input>
                 </td>
                 <td>
-                  <span class="badge badge-success" :data-id="item.title" style="cursor: pointer" @click="openUrl(item.eprint)">View document</span>
-                  <b-input v-model="item.eprint" :name="item.title" style="display: none"></b-input>
+                  <span v-if="typeof item.eprint !== 'undefined'" class="badge badge-success" :data-id="item.title" style="cursor: pointer" @click="openUrl(item.eprint)">View document</span>
+                  <span v-else-if="typeof item.link !== 'undefined'" class="badge badge-success" :data-id="item.title" style="cursor: pointer" @click="openUrl(item.link)">View document</span>
+                  <b-input v-if="typeof item.eprint !== 'undefined'" v-model="item.eprint" :name="item.title" style="display: none"></b-input>
+                  <b-input v-else-if="typeof item.link !== 'undefined'" v-model="item.link" :name="item.title" style="display: none"></b-input>
                 </td>
                 <td>
                   <i title="Edit citation" :data-id="'icon-edit-' + item.title" v-b-tooltip.hover class="fa fa-edit citation-icon" style="color: #2a80ff !important;" @click="editCitationsData(item.title)"></i>
@@ -178,28 +193,6 @@
                 </td>
               </tr>
             </template>
-          </tbody>
-        </table>
-        <table class="table table-bordered table-responsive-xl table-hover" v-if="showSemmanticTable">
-          <thead class="thead-light">
-          <tr>
-            <th>Title</th>
-            <th>Year</th>
-            <th>URL</th>
-            <th>Authors</th>
-            <th>Domains</th>
-          </tr>
-          </thead>
-          <tbody>
-          <template v-for="item in this.citationsArray[this.usedCitationTitle]">
-            <tr>
-              <td>{{item.title}}</td>
-              <td>{{item.year}}</td>
-              <td><span class="badge badge-warning" style="cursor: pointer" @click="openUrl(item.link)">View document</span></td>
-              <td>{{item.authors}}</td>
-              <td>{{item.domains}}</td>
-            </tr>
-          </template>
           </tbody>
         </table>
       </div>
@@ -317,7 +310,6 @@
         usedCitationTitle: '',
         showScolarTable: false,
         citationsAlert: true,
-        showSemmanticTable: false,
         citationsArray: {}
       };
     },
@@ -347,7 +339,6 @@
         this.modalTitle = 'Citations for: ' + publicationName;
         this.usedCitationTitle = publicationName;
         this.showScolarTable = false;
-        this.showSemmanticTable = false;
         this.citationsAlert = false;
         $('.modal-spinner').show();
 
@@ -365,20 +356,10 @@
           axios.post(path, data)
             .then((response) => {
               $('.modal-spinner').hide();
-              if (typeof response.data.semantic_citations !== 'undefined') {
-                if (typeof response.data.semantic_citations.message !== 'undefined') {
-                  this.citationsAlert = true;
-                } else {
-                  this.citationsArray[publicationName] = response.data.semantic_citations;
-                  this.showSemmanticTable = true;
-                }
-              } else {
                 if (typeof response.data.scholar_citations !== 'undefined') {
                   this.citationsArray[publicationName] = response.data.scholar_citations.publications;
                   this.showScolarTable = true;
                 }
-
-              }
             });
         } else {
           $('.modal-spinner').hide();
@@ -650,7 +631,9 @@
         var submitButtonId = 'icon-submit-' + title;
         $("input[name='" +title+ "']").show();
         $("span[class='title-" +title+ "']").hide();
+        $("span[class='authors-" +title+ "']").hide();
         $('span[data-id="'+title+'"]').hide();
+        $("span[class='domains-" +title+ "']").hide();
         $('i[data-id="'+editButtonId+'"]').hide();
         $('i[data-id="'+submitButtonId+'"]').show();
       },
@@ -658,7 +641,9 @@
         var editButtonId = 'icon-edit-' + title;
         var submitButtonId = 'icon-submit-' + title;
         $("input[name='" +title+ "']").hide();
+        $("span[class='authors-" +title+ "']").show();
         $("span[class='title-" +title+ "']").show();
+        $("span[class='domains-" +title+ "']").show();
         $('span[data-id="'+title+'"]').show();
         $('i[data-id="'+editButtonId+'"]').show();
         $('i[data-id="'+submitButtonId+'"]').hide();
