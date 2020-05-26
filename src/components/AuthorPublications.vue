@@ -28,6 +28,7 @@
                                        title="Order by title" v-b-tooltip.hover>Name</a></th>
             <th class="text-center"><a href="javascript:;" @click="yearOrder()"
                                        title="Order by year" v-b-tooltip.hover>Year</a></th>
+            <th class="text-center">Authors</th>
             <th class="text-center">Publication Name</th>
             <th class="text-center" style="white-space: nowrap">Scholar <br> - Cited By -</th>
             <th class="text-center" style="white-space: nowrap">Scholar <br> - Citations -</th>
@@ -68,6 +69,7 @@
               </td>
               <td class="text-center"><span v-if="publication.year">{{publication.year}}</span>
                 <span v-else>-</span></td>
+              <td class="text-center">{{publication.authors}}</td>
               <td class="text-center"><span
                 v-if="typeof(publication.publication_name) !== 'undefined' && publication.publication_name">{{publication.publication_name}}</span>
                 <span v-else>-</span></td>
@@ -222,6 +224,13 @@
 
       <b-input-group class="mt-2">
         <template v-slot:prepend>
+          <b-input-group-text class="edit-input-text">Authors</b-input-group-text>
+        </template>
+        <b-form-input v-model="editAuthorsPublication"></b-form-input>
+      </b-input-group>
+
+      <b-input-group class="mt-2">
+        <template v-slot:prepend>
           <b-input-group-text class="edit-input-text">Publication</b-input-group-text>
         </template>
         <b-form-input v-model="editPublicationText"></b-form-input>
@@ -311,6 +320,7 @@
         editTitle: '',
         editPublicationText: '',
         editModalUrl: '',
+        editAuthorsPublication: '',
         editScopusCitations: '',
         editScholarCitations: '',
         publicationSearch: '',
@@ -423,6 +433,7 @@
         this.editModalTitle = publicationName;
         this.editTitle = publicationName;
         this.editPublicationText = this.authorPublications[publicationName]['publication_name'];
+        this.editAuthorsPublication = this.authorPublications[publicationName]['authors'];
         this.editModalUrl = this.authorPublications[publicationName]['eprint'];
         this.editScholarCitations = this.authorPublications[publicationName]['cited_by_scholar'];
         this.editScopusCitations = this.authorPublications[publicationName]['cited_by_scopus'];
@@ -434,6 +445,7 @@
         let oldPublicationName = this.editModalTitle;
         this.authorPublications[oldPublicationName]['title'] = newPublicationName;
         this.authorPublications[oldPublicationName]['publication_name'] = this.editPublicationText;
+        this.authorPublications[oldPublicationName]['authors'] = this.editAuthorsPublication;
         this.authorPublications[oldPublicationName]['eprint'] = this.editModalUrl;
         this.authorPublications[oldPublicationName]['cited_by_scholar'] = this.editScholarCitations;
         this.authorPublications[oldPublicationName]['cited_by_scopus'] = this.editScopusCitations;

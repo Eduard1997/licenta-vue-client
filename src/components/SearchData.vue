@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="container">
+    <div class="container mt-2">
       <pulse-loader class="centered" :loading="loading" :color="color" :size="size"></pulse-loader>
       <div class="alert alert-danger" v-if="showAlert">{{alertText}}</div>
       <div class="row">
@@ -215,17 +215,35 @@
           var reader = new FileReader();
 
           reader.addEventListener('load', function (e) {
-            decodedData = JSON.parse(e.target.result);
-            self.responseSearchAuthor = decodedData['topData'];
-            self.authorPublications = decodedData['authorPublications'];
-            self.citationsArray = decodedData['citationsData']
-            self.showPublications = true;
-            self.displayAuthor = true;
-
+            try {
+              decodedData = JSON.parse(e.target.result);
+            } catch (e) {
+              self.openImportError();
+              return false;
+            }
+            if(decodedData.hasOwnProperty('topData') && decodedData.hasOwnProperty('authorPublications') && decodedData.hasOwnProperty('citationsData')) {
+              self.responseSearchAuthor = decodedData['topData'];
+              self.authorPublications = decodedData['authorPublications'];
+              self.citationsArray = decodedData['citationsData']
+              self.showPublications = true;
+              self.displayAuthor = true;
+            } else {
+              self.openImportError();
+              return false;
+            }
           });
           reader.readAsBinaryString(myFile);
         }
         $('.import-input > input').val('');
+      },
+      openImportError() {
+        this.$vToastify.error({
+          errorDuration: 1000,
+          title: "Error!",
+          body: "Invalid JSON!",
+          type: "error",
+          theme: 'dark'
+        });
       },
       viewSource(url) {
         window.open(url);
@@ -245,5 +263,10 @@
 
   .card-img-top {
     width: 225px !important;
+  }
+
+  .vt-notification-container {
+    top: 0 !important;
+    right: 0 !important;
   }
 </style>
