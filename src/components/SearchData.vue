@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <!--<div class="bg">-->
     <div class="container mt-2">
       <pulse-loader class="centered" :loading="loading" :color="color" :size="size"></pulse-loader>
       <div class="alert alert-danger" v-if="showAlert">{{alertText}}</div>
@@ -269,4 +269,20 @@
     top: 0 !important;
     right: 0 !important;
   }
+
+  body, html {
+    height: 100%;
+  }
+  /*.bg {
+    !* The image used *!
+    background-image: url("https://mdbootstrap.com/img/Photos/Horizontal/Nature/full page/img(20).jpg");
+
+    !* Full height *!
+    height: 100%;
+
+    !* Center and scale the image nicely *!
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+  }*/
 </style>

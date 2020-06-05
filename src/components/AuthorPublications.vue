@@ -26,8 +26,9 @@
           <tr>
             <th class="text-center"><a href="javascript:;" @click="nameOrder()"
                                        title="Order by title" v-b-tooltip.hover>Name</a></th>
-            <th class="text-center"><a href="javascript:;" @click="yearOrder()"
-                                       title="Order by year" v-b-tooltip.hover>Year</a></th>
+            <th class="text-center">
+              <a href="javascript:;" @click="yearOrder()" title="Order by year" v-b-tooltip.hover>Year</a>
+            </th>
             <th class="text-center">Authors</th>
             <th class="text-center">Publication Name</th>
             <th class="text-center" style="white-space: nowrap">Scholar <br> - Cited By -</th>
@@ -67,12 +68,24 @@
                    v-else
                    @click="documentNotAvailable()" style="cursor: pointer">{{publication.title}}</a>
               </td>
-              <td class="text-center"><span v-if="publication.year">{{publication.year}}</span>
-                <span v-else>-</span></td>
-              <td class="text-center">{{publication.authors}}</td>
-              <td class="text-center"><span
-                v-if="typeof(publication.publication_name) !== 'undefined' && publication.publication_name">{{publication.publication_name}}</span>
-                <span v-else>-</span></td>
+              <td class="text-center">
+                  <b-form-radio v-b-tooltip.hover title="Show publications only for this year" v-if="publication.year" name="year-radios" :value="publication.year" v-on:change="yearChanged()">
+                    <span v-if="publication.year">{{publication.year}}</span>
+                  </b-form-radio>
+                <span v-else>-</span>
+              </td>
+              <td class="text-center">
+                <b-form-radio v-b-tooltip.hover title="Show publications wrote by those authors" name="authors-radios" :value="publication.authors" v-on:change="authorsChanged()">
+                  <span>{{publication.authors}}</span>
+                </b-form-radio>
+
+              </td>
+              <td class="text-center">
+                <b-form-radio v-if="typeof(publication.publication_name) !== 'undefined' && publication.publication_name" v-b-tooltip.hover title="Show documents from this publication" name="publications-radios" :value="publication.publication_name" v-on:change="publicationsChanged()">
+                  <span >{{publication.publication_name}}</span>
+                </b-form-radio>
+                <span v-else>-</span>
+              </td>
               <td class="text-center"><span
                 v-if="typeof(publication.cited_by_scholar) !== 'undefined' && publication.cited_by_scholar">{{publication.cited_by_scholar}}</span>
                 <span v-else>-</span></td>
@@ -139,7 +152,9 @@
                    style="margin: auto; display: none"></b-spinner>
       </div>
       <div class="modal-content-citations">
-        <b-alert variant="danger" v-if="citationsAlert && !showScolarTable" show>No citations found!</b-alert>
+        <b-alert variant="danger" v-if="citationsAlert && !showScolarTable" show>No citations
+          found!
+        </b-alert>
         <table class="table table-bordered table-responsive-xl table-hover scholar-ciations-table"
                v-if="showScolarTable && !citationsAlert">
           <thead class="thead-light">
@@ -335,6 +350,7 @@
         usedCitationTitle: '',
         showScolarTable: false,
         citationsAlert: true,
+        yearChecked: '',
         citationsArray: {}
       };
     },
@@ -383,7 +399,7 @@
             .then((response) => {
               $('.modal-spinner').hide();
               if (typeof response.data.scholar_citations !== 'undefined') {
-                if(typeof response.data.scholar_citations.publications.message !== 'undefined' && Object.keys(response.data.scholar_citations.publications).length === 1) {
+                if (typeof response.data.scholar_citations.publications.message !== 'undefined' && Object.keys(response.data.scholar_citations.publications).length === 1) {
                   this.citationsAlert = true;
                   this.showScolarTable = false;
                   this.citationsArray[publicationName] = response.data.scholar_citations.publications.message;
@@ -398,7 +414,7 @@
         } else {
           $('.modal-spinner').hide();
 
-          if(this.citationsArray[publicationName] === 'Article not found on Semantic Scholar') {
+          if (this.citationsArray[publicationName] === 'Article not found on Semantic Scholar') {
             this.citationsAlert = true;
             this.showScolarTable = false;
           } else {
@@ -667,6 +683,9 @@
         })
       },
       resetTable() {
+        $('input[name=year-radios]').prop('checked', false);
+        $('input[name=authors-radios]').prop('checked', false);
+        $('input[name=publications-radios]').prop('checked', false);
         $('tbody>tr').show();
         this.searchedTitle = '';
       },
@@ -700,9 +719,47 @@
           data_arr[data.title] = data;
         });
         this.authorPublications = data_arr;
+      },
+      yearChanged() {
+        var yearSelected = $('input[name=year-radios]:checked').val();
+        $('tbody>tr').show();
+        $('input[name=authors-radios]').prop('checked', false);
+        $('input[name=publications-radios]').prop('checked', false);
+        var self = this;
+        $.each(this.authorPublications, function (key, value) {
+          if (parseInt(value.year) !== parseInt(yearSelected)) {
+            var index = Object.keys(self.authorPublications).indexOf(value.title);
+            $('tbody > tr').eq(index).hide();
+          }
+        })
+      },
+      authorsChanged() {
+        var authorsSelected = $('input[name=authors-radios]:checked').val();
+        var self = this;
+        $('tbody>tr').show();
+        $('input[name=year-radios]').prop('checked', false);
+        $('input[name=publications-radios]').prop('checked', false);
+        $.each(this.authorPublications, function (key, value) {
+          if (value.authors.replace(/\,/g, '').replace(/\./g, '').toLowerCase().search(authorsSelected.replace(/\,/g, '').replace(/\./g, '').toLowerCase()) == -1) {
+            var index = Object.keys(self.authorPublications).indexOf(value.title);
+            $('tbody > tr').eq(index).hide();
+          }
+        })
+      },
+      publicationsChanged() {
+        var publciationsSelected = $('input[name=publications-radios]:checked').val();
+        var self = this;
+        $('tbody>tr').show();
+        $('input[name=year-radios]').prop('checked', false);
+        $('input[name=authors-radios]').prop('checked', false);
+        $.each(this.authorPublications, function (key, value) {
+          if (value.publication_name !== publciationsSelected) {
+            var index = Object.keys(self.authorPublications).indexOf(value.title);
+            $('tbody > tr').eq(index).hide();
+          }
+        })
       }
     },
-
     created() {
       this.getAuthorPublications();
     }
@@ -752,6 +809,16 @@
   .success-border {
     box-shadow: 0 0 0 3px green;
   }
+
+  .custom-control-label::before {
+    top: 0.1rem !important;
+  }
+  .custom-control-label::after {
+    top: 0.10rem !important;
+    left: -1.5rem !important;
+  }
+
+
 
 </style>
 

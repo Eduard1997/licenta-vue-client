@@ -16,12 +16,12 @@
         <!--    </nav>-->
         <div class="masthead">
             <div class="container">
-                <div class="masthead-subheading" style="color: #fed136 !important; font-weight: bold">Welcome to</div>
-                <div class="masthead-heading text-uppercase" style="color: #fed136 !important;margin-bottom: 2rem !important;">ScholarTech</div>
-                <div class="masthead-subheading" style="color: #fed136 !important; font-weight: bold;margin-bottom: 4rem !important;">Your personal
+                <div class="masthead-subheading" style="color: rgb(25,128,229) !important; font-weight: bold">Welcome to</div>
+                <div class="masthead-heading text-uppercase" style="color: rgb(25,128,229) !important;margin-bottom: 2rem !important;">ScholarTech</div>
+                <div class="masthead-subheading" style="color: rgb(25,128,229) !important; font-weight: bold;margin-bottom: 4rem !important;">Your personal
                     engine for searching scholarly literature
                 </div>
-                <a class="btn btn-primary btn-xl text-uppercase js-scroll-trigger" @click="goToAuthors">Let's go!</a>
+                <a class="btn btn-primary btn-xl text-uppercase js-scroll-trigger" @click="goToAuthors" style="background-color: rgb(25,128,229) !important">Let's go!</a>
             </div>
         </div>
     </div>
