@@ -1,5 +1,5 @@
 <template>
-  <!--<div class="bg">-->
+  <div class="bg">
     <div class="container mt-2">
       <pulse-loader class="centered" :loading="loading" :color="color" :size="size"></pulse-loader>
       <div class="alert alert-danger" v-if="showAlert">{{alertText}}</div>
