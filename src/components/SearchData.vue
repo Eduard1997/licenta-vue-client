@@ -1,5 +1,8 @@
 <template>
   <div class="bg">
+    <div class="ml-3" style="text-align: left; position: absolute">
+      <span style="font-family: 'Lobster', cursive; color: rgb(25,128,229); font-size: 27px; cursor: pointer" v-on:click="goToHome()">ScholarTech</span>
+    </div>
     <div class="container mt-2">
       <pulse-loader class="centered" :loading="loading" :color="color" :size="size"></pulse-loader>
       <div class="alert alert-danger" v-if="showAlert">{{alertText}}</div>
@@ -177,24 +180,17 @@
           axios.post(path, data)
             .then((response) => {
               this.loading = false;
-              this.showPublications = true;
+
               if (typeof response.data.error !== 'undefined') {
-                this.alertText = response.data.error;
-                this.showAlert = true;
-                setTimeout(() => {
-                  this.showAlert = false;
-                }, 2000);
+                this.openImportError('Author data not found!');
               } else {
+                this.showPublications = true;
                 this.displayAuthor = true;
                 this.responseSearchAuthor = response.data;
               }
             });
         } else {
-          this.alertText = 'Please type an author name';
-          this.showAlert = true;
-          setTimeout(() => {
-            this.showAlert = false;
-          }, 2000);
+          this.openImportError('Please type an author name!');
         }
       },
       searchCoauthor(coauthorName) {
@@ -236,14 +232,17 @@
         }
         $('.import-input > input').val('');
       },
-      openImportError() {
+      openImportError(message) {
         this.$vToastify.error({
           errorDuration: 1000,
           title: "Error!",
-          body: "Invalid JSON!",
+          body: typeof message === 'undefined' ? "Invalid JSON!" : message,
           type: "error",
           theme: 'dark'
         });
+      },
+      goToHome() {
+        this.$router.push({name: 'Welcome'});
       },
       viewSource(url) {
         window.open(url);
@@ -253,6 +252,7 @@
 </script>
 
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=Lobster&display=swap');
   .centered {
     position: fixed;
     top: 50%;

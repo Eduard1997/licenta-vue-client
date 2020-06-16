@@ -1,5 +1,10 @@
 <template>
     <div>
+      <div class="ml-3" style="text-align: left; position: absolute">
+        <span style="font-family: 'Lobster', cursive; color: rgb(25,128,229); font-size: 15px;">ScholarTech v1.0.0</span> <br>
+        <span style="font-family: 'Lobster', cursive; color: rgb(25,128,229); font-size: 15px;">By Eduard Gherghelucă</span> <br>
+        <a href="mailto:ghergheluca_edi@yahoo.com" style="font-family: 'Lobster', cursive; color: rgb(25,128,229); font-size: 15px;">Email me!</a>
+      </div>
         <!--    <nav class="navbar navbar-expand-lg navbar-dark fixed-top" id="mainNav">-->
         <!--      <div class="container">-->
         <!--        <a class="navbar-brand js-scroll-trigger" href="#page-top"><img src="assets/img/navbar-logo.svg" alt="" /></a><button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">Menu<i class="fas fa-bars ml-1"></i></button>-->

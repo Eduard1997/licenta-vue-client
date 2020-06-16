@@ -10,6 +10,7 @@
           </button>
           <button class="btn btn-sm btn-info mb-2 ml-2" v-on:click="exportData()">Export data
           </button>
+          <button class="btn btn-sm btn-info mb-2 ml-2" v-on:click="exportFilteredData()">Export filtered data</button>
           <input id="search-table" class="form-control mb-2 ml-2" placeholder="Search title..."
                  v-model="searchedTitle" v-on:keyup.enter="searchTable()"/>
           <button type="button" id="search-title-btn" class="btn btn-sm btn-dark mb-2 ml-2"
@@ -351,7 +352,9 @@
         showScolarTable: false,
         citationsAlert: true,
         yearChecked: '',
-        citationsArray: {}
+        citationsArray: {},
+        filteredData: {},
+        filteredMode: false
       };
     },
     methods: {
@@ -362,9 +365,12 @@
           data['authorName'] = this.authorName;
           axios.post(path, data)
             .then((response) => {
+              this.loading = false;
               if (typeof response.data.error === 'undefined') {
                 this.authorPublications = response.data.publications;
-                this.loading = false;
+              } else {
+                console.log('intra');
+                this.openExportError('Author publications not found!');
               }
             });
         } else {
@@ -564,17 +570,39 @@
       },
       exportData() {
         var data = {};
+        var date = new Date();
+        var timestamp = date.getFullYear().toString() + date.getMonth().toString() + date.getDate().toString() + date.getHours().toString() + date.getMinutes().toString() + date.getSeconds().toString();
         data['topData'] = this.authorTopData;
         data['authorPublications'] = this.authorPublications;
         data['citationsData'] = this.citationsArray;
         var encoded_data = JSON.stringify(data);
         var element = document.createElement('a');
         element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(encoded_data));
-        element.setAttribute('download', 'export');
+        element.setAttribute('download', 'scholartechData_' + timestamp);
         element.style.display = 'none';
         document.body.appendChild(element);
         element.click();
         document.body.removeChild(element);
+      },
+      exportFilteredData() {
+        if(this.filteredMode === false) {
+          this.openExportError();
+        } else {
+          var data = {};
+          var date = new Date();
+          var timestamp = date.getFullYear().toString() + date.getMonth().toString() + date.getDate().toString() + date.getHours().toString() + date.getMinutes().toString() + date.getSeconds().toString();
+          data['topData'] = this.authorTopData;
+          data['authorPublications'] = this.filteredData;
+          data['citationsData'] = this.citationsArray;
+          var encoded_data = JSON.stringify(data);
+          var element = document.createElement('a');
+          element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(encoded_data));
+          element.setAttribute('download', 'scholartechFilteredData_' + timestamp);
+          element.style.display = 'none';
+          document.body.appendChild(element);
+          element.click();
+          document.body.removeChild(element);
+        }
       },
       documentNotAvailable() {
         this.$swal({
@@ -688,6 +716,8 @@
         $('input[name=publications-radios]').prop('checked', false);
         $('tbody>tr').show();
         this.searchedTitle = '';
+        this.filteredData = {};
+        this.filteredMode = false;
       },
       editCitationsData(title) {
         var editButtonId = 'icon-edit-' + title;
@@ -721,6 +751,8 @@
         this.authorPublications = data_arr;
       },
       yearChanged() {
+        this.filteredMode = true;
+        this.filteredData = {};
         var yearSelected = $('input[name=year-radios]:checked').val();
         $('tbody>tr').show();
         $('input[name=authors-radios]').prop('checked', false);
@@ -730,10 +762,14 @@
           if (parseInt(value.year) !== parseInt(yearSelected)) {
             var index = Object.keys(self.authorPublications).indexOf(value.title);
             $('tbody > tr').eq(index).hide();
+          } else {
+            self.filteredData[key] = self.authorPublications[key];
           }
         })
       },
       authorsChanged() {
+        this.filteredData = {};
+        this.filteredMode = true;
         var authorsSelected = $('input[name=authors-radios]:checked').val();
         var self = this;
         $('tbody>tr').show();
@@ -743,10 +779,14 @@
           if (value.authors.replace(/\,/g, '').replace(/\./g, '').toLowerCase().search(authorsSelected.replace(/\,/g, '').replace(/\./g, '').toLowerCase()) == -1) {
             var index = Object.keys(self.authorPublications).indexOf(value.title);
             $('tbody > tr').eq(index).hide();
+          } else {
+            self.filteredData[key] = self.authorPublications[key];
           }
         })
       },
       publicationsChanged() {
+        this.filteredData = {};
+        this.filteredMode = true;
         var publciationsSelected = $('input[name=publications-radios]:checked').val();
         var self = this;
         $('tbody>tr').show();
@@ -756,9 +796,20 @@
           if (value.publication_name !== publciationsSelected) {
             var index = Object.keys(self.authorPublications).indexOf(value.title);
             $('tbody > tr').eq(index).hide();
+          } else {
+            self.filteredData[key] = self.authorPublications[key];
           }
         })
-      }
+      },
+      openExportError(message) {
+        this.$vToastify.error({
+          errorDuration: 1000,
+          title: "Error!",
+          body: typeof message === 'undefined' ? "You need to filter the data from table!" : message,
+          type: "error",
+          theme: 'dark'
+        });
+      },
     },
     created() {
       this.getAuthorPublications();
@@ -817,8 +868,9 @@
     top: 0.10rem !important;
     left: -1.5rem !important;
   }
-
-
-
+  .vt-notification-container {
+    top: 0 !important;
+    right: 0 !important;
+  }
 </style>
 
