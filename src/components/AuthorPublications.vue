@@ -369,7 +369,6 @@
               if (typeof response.data.error === 'undefined') {
                 this.authorPublications = response.data.publications;
               } else {
-                console.log('intra');
                 this.openExportError('Author publications not found!');
               }
             });
@@ -404,6 +403,11 @@
           axios.post(path, data)
             .then((response) => {
               $('.modal-spinner').hide();
+              //if(typeof response.data.error === 'undefined') {
+              if (typeof response.data.error !== 'undefined') {
+                this.openExportError('Citations not found!');
+                return;
+              }
               if (typeof response.data.scholar_citations !== 'undefined') {
                 if (typeof response.data.scholar_citations.publications.message !== 'undefined' && Object.keys(response.data.scholar_citations.publications).length === 1) {
                   this.citationsAlert = true;
@@ -533,6 +537,10 @@
           const path = `${this.test_url}/get-searched-publication`;
           axios.post(path, data)
             .then((response) => {
+              if (typeof response.data.error !== 'undefined') {
+                this.openExportError('Publication not found!');
+                return;
+              }
               this.searchPubSpinner = false;
               if (Object.keys(response.data.publications).length) {
                 this.searchResponse = response.data.publications;
@@ -651,6 +659,12 @@
           var item = obj[id];
           result.push(item);
         }
+        setTimeout(function() {
+          $('input[name=year-radios]').prop('checked', false);
+          $('input[name=authors-radios]').prop('checked', false);
+          $('input[name=publications-radios]').prop('checked', false);
+        },100);
+
         return result;
       },
       sortByYear(data, attr) {
@@ -689,6 +703,11 @@
           var item = obj[id];
           result.push(item);
         }
+        setTimeout(function() {
+          $('input[name=year-radios]').prop('checked', false);
+          $('input[name=authors-radios]').prop('checked', false);
+          $('input[name=publications-radios]').prop('checked', false);
+        },100);
         return result;
       },
       nameOrder() {
@@ -697,6 +716,9 @@
 
       },
       yearOrder() {
+        $('input[name=year-radios]').prop('checked', false);
+        $('input[name=authors-radios]').prop('checked', false);
+        $('input[name=publications-radios]').prop('checked', false);
         this.authorPublications = this.sortByYear(this.authorPublications, 'year');
         this.renameAuthorPubArray();
       },
@@ -751,6 +773,7 @@
         this.authorPublications = data_arr;
       },
       yearChanged() {
+        console.log('intra year');
         this.filteredMode = true;
         this.filteredData = {};
         var yearSelected = $('input[name=year-radios]:checked').val();
