@@ -773,7 +773,6 @@
         this.authorPublications = data_arr;
       },
       yearChanged() {
-        console.log('intra year');
         this.filteredMode = true;
         this.filteredData = {};
         var yearSelected = $('input[name=year-radios]:checked').val();
