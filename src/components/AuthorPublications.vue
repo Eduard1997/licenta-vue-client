@@ -219,7 +219,7 @@
                 <i title="Edit citation" :data-id="'icon-edit-' + item.title" v-b-tooltip.hover
                    class="fa fa-edit citation-icon" style="color: #2a80ff !important;"
                    @click="editCitationsData(item.title)"></i>
-                <i title="Edit citation" :data-id="'icon-submit-' + item.title" v-b-tooltip.hover
+                <i title="Save citation" :data-id="'icon-submit-' + item.title" v-b-tooltip.hover
                    class="fa fa-check citation-icon" style="display: none"
                    @click="confirmCitationData(item.title)"></i>
               </td>
@@ -515,17 +515,16 @@
         $.each(Object.keys(this.authorPublications), (index, val) => {
           if (val === name) {
             this.pubAlreadyExist = true;
-            return false;
+            return true;
           }
         });
-        return true;
+        return false;
       },
       searchPublication() {
         var existance = this.verifyPubExistance(this.publicationSearch);
-
+        console.log(existance);
         this.searchNotFound = false;
         this.searchHasResults = false;
-        //existance = false;
         if (!existance) {
           this.searchPubSpinner = true;
           this.pubAlreadyExist = false;
