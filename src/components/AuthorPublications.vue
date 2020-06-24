@@ -525,7 +525,7 @@
 
         this.searchNotFound = false;
         this.searchHasResults = false;
-        existance = false;
+        //existance = false;
         if (!existance) {
           this.searchPubSpinner = true;
           this.pubAlreadyExist = false;
