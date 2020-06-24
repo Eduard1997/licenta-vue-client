@@ -1,7 +1,7 @@
 <template>
     <div>
       <div class="ml-3" style="text-align: left; position: absolute">
-        <span style="font-family: 'Lobster', cursive; color: rgb(25,128,229); font-size: 15px;">ScholarTech v1.0.0</span> <br>
+        <span style="font-family: 'Lobster', cursive; color: rgb(25,128,229); font-size: 15px;">ScholarTech v1.0.0_20200624</span> <br>
         <span style="font-family: 'Lobster', cursive; color: rgb(25,128,229); font-size: 15px;">By Eduard Gherghelucă</span> <br>
         <a href="mailto:ghergheluca_edi@yahoo.com" style="font-family: 'Lobster', cursive; color: rgb(25,128,229); font-size: 15px;">Email me!</a>
       </div>
