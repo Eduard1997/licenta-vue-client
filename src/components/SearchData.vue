@@ -1,7 +1,8 @@
 <template>
   <div class="bg">
     <div class="ml-3" style="text-align: left; position: absolute">
-      <span style="font-family: 'Lobster', cursive; color: rgb(25,128,229); font-size: 27px; cursor: pointer" v-on:click="goToHome()">ScholarTech</span>
+      <span style="font-family: 'Lobster', cursive; color: rgb(25,128,229); font-size: 27px; cursor: pointer" v-on:click="goToHome()">ScholarTech</span> <br>
+      <a href="https://drive.google.com/file/d/1wC-hgjM1oQ1vcb6VKGdIvQlZUKxarYcp/view?usp=sharing" target="_blank">Check the user manual</a>
     </div>
     <div class="container mt-2">
       <pulse-loader class="centered" :loading="loading" :color="color" :size="size"></pulse-loader>
