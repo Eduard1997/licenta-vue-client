@@ -71,7 +71,7 @@
                    height="200">
               <div class="card-body">
                 <h5 class="card-title">{{responseSearchAuthor.author_name}}</h5>
-                <p class="card-text">{{responseSearchAuthor.affiliation}}</p>
+                <p class="card-text">{{responseSearchAuthor.affiliation.length > 0 ? responseSearchAuthor.affiliation : ''}}</p>
               </div>
               <ul class="list-group list-group-flush">
                 <li class="list-group-item">
