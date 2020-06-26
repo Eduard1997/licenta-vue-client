@@ -82,7 +82,7 @@
 
               </td>
               <td class="text-center">
-                <b-form-radio v-if="typeof(publication.publication_name) !== 'undefined' && publication.publication_name" v-b-tooltip.hover title="Show documents from this publication" name="publications-radios" :value="publication.publication_name" v-on:change="publicationsChanged()">
+                <b-form-radio v-if="typeof(publication.publication_name) !== 'undefined' && publication.publication_name && publication.publication_name !== '-'" v-b-tooltip.hover title="Show documents from this publication" name="publications-radios" :value="publication.publication_name" v-on:change="publicationsChanged()">
                   <span >{{publication.publication_name}}</span>
                 </b-form-radio>
                 <span v-else>-</span>

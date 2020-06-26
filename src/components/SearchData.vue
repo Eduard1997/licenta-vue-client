@@ -68,7 +68,8 @@
           <b-collapse id="author-details-collapse" visible>
             <div class="card" style="width: 100%;" v-if="displayAuthor">
               <img :src="responseSearchAuthor.url_picture" class="card-img-top " alt="Avatar"
-                   height="200">
+                   height="200" v-if="responseSearchAuthor.url_picture">
+              <img v-else src="@/assets/avatar_placeholder.png" class="card-img-top " alt="Avatar" height="200">
               <div class="card-body">
                 <h5 class="card-title">{{responseSearchAuthor.author_name}}</h5>
                 <p class="card-text">{{responseSearchAuthor.affiliation.length > 0 ? responseSearchAuthor.affiliation : ''}}</p>
