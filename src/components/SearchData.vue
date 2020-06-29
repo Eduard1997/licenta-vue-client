@@ -84,7 +84,7 @@
                   <b>Coauthors:</b> <br/>
                   <template v-for="(coauthors,key) in responseSearchAuthor.coauthors">
                     <span> <b><a href="javascript:;"
-                                 v-on:click="searchCoauthor(Object.keys(coauthors)[0])" title="Search this author" v-b-tooltip.hover>{{Object.keys(coauthors)[0]}}</a></b>: {{coauthors[Object.keys(coauthors)[0]]}} </span>
+                                 v-on:click="searchCoauthor(Object.keys(coauthors)[0])" >{{Object.keys(coauthors)[0]}}</a></b>: {{coauthors[Object.keys(coauthors)[0]]}} </span>
                     <br/>
                   </template>
                 </li>
